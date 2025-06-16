@@ -28,6 +28,10 @@ const eventSchema = new mongoose.Schema(
       enum: ["Tech", "Health", "Others"],
       default: "Others",
     },
+    image_url: {
+    type: String,
+    required: false,
+    }
   },
   { timestamps: true }
 );
