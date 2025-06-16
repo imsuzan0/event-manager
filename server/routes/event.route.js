@@ -1,10 +1,13 @@
 import express from 'express'
-import { createEvent, deleteEvent, updateEvent } from '../controllers/event.controller'
-
+import { createEvent, deleteEvent, getallEvents, getMyEvents, getSingleEvent, updateEvent } from '../controllers/event.controller.js'
+import {updateImage, deleteImage, uploadImage, upload} from "../middlewares/cloudinary.middleware.js"
 const router = express.Router()
 
-router.post('/create', createEvent)
-router.post('/update', updateEvent)
-router.post('/delete', deleteEvent)
+router.get("/", getallEvents)
+router.get("/myevents", getMyEvents)
+router.get("/:id", getSingleEvent)
+router.post('/create',upload.single("image"),uploadImage, createEvent)
+router.patch('/update',upload.single("image"),updateImage, updateEvent)
+router.delete('/delete',deleteImage, deleteEvent)
 
 export const eventRouter = router

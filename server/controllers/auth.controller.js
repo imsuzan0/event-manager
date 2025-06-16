@@ -34,7 +34,7 @@ export const register = async (req, res) => {
       password: hashedPassword,
       profilePic,
     });
-    res.status(StatusCodes.CREATED).json({
+    return res.status(StatusCodes.CREATED).json({
       msg: "User registered successfully",
       user,
     });

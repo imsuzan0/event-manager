@@ -1,7 +1,7 @@
 import express from "express";
 import dotenv from "dotenv";
-import { authRouter } from "./routes/auth.route";
-import { eventRouter } from "./routes/event.route";
+import { authRouter } from "./routes/auth.route.js";
+import { eventRouter } from "./routes/event.route.js";
 
 dotenv.config();
 
