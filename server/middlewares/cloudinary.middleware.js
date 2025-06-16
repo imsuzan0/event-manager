@@ -12,7 +12,8 @@ export const uploadImage = async (req, res, next) => {
     const file = req.file; // Get the file from the request
 
     if (!file) {
-      return res.status(400).json({ message: "No file uploaded" });
+      // return res.status(400).json({ message: "No file uploaded" });
+      return next()
     }
 
     // Upload the image to Cloudinary
@@ -50,7 +51,8 @@ export const updateImage = async (req, res, next) => {
     const file = req.file; // Get the new file to replace the old one
 
     if (!file) {
-      return res.status(400).json({ message: "No new file uploaded" });
+      // return res.status(400).json({ message: "No new file uploaded" });
+      return next()
     }
 
     // First, delete the existing image using its public_id
@@ -100,7 +102,8 @@ export const deleteImage = async (req, res, next) => {
     const { public_id } = req.body; // Assuming the client sends the public_id of the image to be deleted
 
     if (!public_id) {
-      return res.status(400).json({ message: "No public_id provided" });
+      // return res.status(400).json({ message: "No public_id provided" });
+      return next();
     }
 
     // Delete the image from Cloudinary using its public_id

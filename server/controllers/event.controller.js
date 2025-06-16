@@ -45,7 +45,8 @@ export const updateEvent = async (req, res) => {
     return res.status(StatusCodes.NOT_FOUND).json({ msg: "Event not found" });
   }
 
-  if (event.user_id != userId) {
+
+  if (event.user_id.toString() != userId.toString()) {
     return res
       .status(StatusCodes.UNAUTHORIZED)
       .json({ msg: "You are not authorized to update this event" });
@@ -75,7 +76,7 @@ export const updateEvent = async (req, res) => {
 
     return res.status(StatusCodes.OK).json({
       msg: "Event updated successfully",
-      event,
+      update,
     });
   } catch (error) {
     console.error("Error updating the event:", error);
@@ -94,13 +95,13 @@ export const deleteEvent = async (req, res) => {
       return res.status(StatusCodes.NOT_FOUND).json({ msg: "Event not found" });
     }
 
-    if (event.user_id != userId) {
+    if (event.user_id.toString() != userId.toString()) {
       return res
         .status(StatusCodes.UNAUTHORIZED)
         .json({ msg: "You are not authorized to delete this event" });
     }
 
-    await event.remove();
+    await Event.findByIdAndDelete(id);
     res.status(200).json({ msg: "Event removed successfully" });
   } catch (error) {
     res

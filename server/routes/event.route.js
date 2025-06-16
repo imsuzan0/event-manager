@@ -27,12 +27,12 @@ router.post(
   createEvent
 );
 router.patch(
-  "/update",
+  "/update/:id",
   protectRoute,
   upload.single("image"),
   updateImage,
   updateEvent
 );
-router.delete("/delete", protectRoute, deleteImage, deleteEvent);
+router.delete("/delete/:id", protectRoute, deleteImage, deleteEvent);
 
 export const eventRouter = router;
