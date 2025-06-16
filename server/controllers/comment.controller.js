@@ -1,4 +1,5 @@
-import Comment from "../models/comment.model";
+import { StatusCodes } from "http-status-codes";
+import {Comment} from "../models/comment.model.js";
 
 export const addComment = async (req, res) => {
   try {
@@ -24,6 +25,7 @@ export const addComment = async (req, res) => {
 
 export const deleteComment = async (req, res) => {
   try {
+    const userId = req.user._id;
     const { commentId } = req.params;
     const comment = await Comment.findById(commentId);
     if (!comment) {

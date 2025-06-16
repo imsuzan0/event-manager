@@ -31,10 +31,13 @@ const eventSchema = new mongoose.Schema(
     image_url: {
     type: String,
     required: false,
+    },
+    phone_number: {
+      type: String,
+      required: false
     }
   },
   { timestamps: true }
 );
 
-const Event = mongoose.model("Event", eventSchema);
-export default Event;
+export const Event = mongoose.model("Event", eventSchema);
