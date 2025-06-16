@@ -2,6 +2,8 @@ import express from "express";
 import dotenv from "dotenv";
 import { authRouter } from "./routes/auth.route.js";
 import { eventRouter } from "./routes/event.route.js";
+import { likeRouter } from "./routes/like.route.js";
+import { commentRouter } from "./routes/comment.route.js";
 import cookieParser from "cookie-parser";
 import connectDB from "./db/db.js";
 
