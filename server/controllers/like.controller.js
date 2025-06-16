@@ -3,7 +3,7 @@ import { StatusCodes } from "http-status-codes";
 
 export const likeUnlikeToggle = async (req, res) => {
   try {
-    const userId = req.user._id;
+    const userId = req.user.id;
     const { eventId } = req.params;
 
     const existingLike = await Like.findOne({
@@ -12,7 +12,7 @@ export const likeUnlikeToggle = async (req, res) => {
     });
 
     if (existingLike) {
-      await existingLike.remove();
+      await Like.findByIdAndDelete(existingLike._id.toString());
       return res
         .status(StatusCodes.OK)
         .json({ msg: "Like removed successfully" });

@@ -13,7 +13,14 @@ import {
   uploadImage,
   upload,
 } from "../middlewares/cloudinary.middleware.js";
+import {
+  addComment,
+  updateComment,
+  deleteComment,
+  getEventComments,
+} from "../controllers/comment.controller.js";
 import { protectRoute } from "../middlewares/protectRoute.middleware.js";
+import { getEventLikes, likeUnlikeToggle } from "../controllers/like.controller.js";
 const router = express.Router();
 
 router.get("/", protectRoute, getallEvents);
@@ -34,5 +41,15 @@ router.patch(
   updateEvent
 );
 router.delete("/delete/:id", protectRoute, deleteImage, deleteEvent);
+
+// like
+router.post("/like/:eventId", protectRoute, likeUnlikeToggle);
+router.get("/likes/:eventId", getEventLikes);
+
+//comment
+router.post("/comment/create/:eventId", protectRoute, addComment);
+router.patch("/comment/update/:commentId", protectRoute, updateComment);
+router.delete("/comment/delete/:commentId", protectRoute, deleteComment);
+router.get("/comments/:eventId", getEventComments);
 
 export const eventRouter = router;
