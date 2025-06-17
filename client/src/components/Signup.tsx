@@ -1,58 +1,109 @@
-
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { useAuth } from '@/contexts/AuthContext';
-import { useToast } from '@/hooks/use-toast';
-import { Calendar, Eye, EyeOff } from 'lucide-react';
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useAuth } from "@/hooks/use-auth";
+import { useToast } from "@/hooks/use-toast";
+import { Calendar, Eye, EyeOff } from "lucide-react";
 
 const Signup = () => {
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    password: '',
-    confirmPassword: ''
+    fullName: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
   });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { signup, isLoading } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (formData.password !== formData.confirmPassword) {
+  const validateForm = () => {
+    // Check required fields
+    if (
+      !formData.fullName ||
+      !formData.email ||
+      !formData.password ||
+      !formData.confirmPassword
+    ) {
       toast({
-        title: "Password mismatch",
-        description: "Passwords do not match. Please try again.",
+        title: "Validation Error",
+        description: "Please fill in all the required fields",
         variant: "destructive",
       });
+      return false;
+    }
+
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      toast({
+        title: "Validation Error",
+        description: "Please enter a valid email address",
+        variant: "destructive",
+      });
+      return false;
+    }
+
+    // Check password length
+    if (formData.password.length < 6) {
+      toast({
+        title: "Validation Error",
+        description: "Password must be at least 6 characters long",
+        variant: "destructive",
+      });
+      return false;
+    }
+
+    // Check password match
+    if (formData.password !== formData.confirmPassword) {
+      toast({
+        title: "Validation Error",
+        description: "Passwords do not match",
+        variant: "destructive",
+      });
+      return false;
+    }
+
+    return true;
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!validateForm()) {
       return;
     }
 
+    setIsSubmitting(true);
     try {
-      await signup(formData.email, formData.password, formData.name);
+      await signup(formData.email, formData.password, formData.fullName);
       toast({
         title: "Welcome to EventHub!",
         description: "Your account has been created successfully.",
       });
-      navigate('/');
+      navigate("/");
     } catch (error) {
       toast({
-        title: "Signup failed",
-        description: "Please try again later.",
+        title: "Registration failed",
+        description:
+          error instanceof Error
+            ? error.message
+            : "An error occurred during registration",
         variant: "destructive",
       });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     });
   };
 
@@ -68,22 +119,25 @@ const Signup = () => {
               EventHub
             </span>
           </div>
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">Create Account</h1>
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">
+            Create Account
+          </h1>
           <p className="text-gray-600">Join the EventHub community</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <Label htmlFor="name">Full Name</Label>
+            <Label htmlFor="fullName">Full Name</Label>
             <Input
               type="text"
-              id="name"
-              name="name"
+              id="fullName"
+              name="fullName"
               required
-              value={formData.name}
+              value={formData.fullName}
               onChange={handleInputChange}
               placeholder="Enter your full name"
               className="mt-1"
+              disabled={isLoading || isSubmitting}
             />
           </div>
 
@@ -98,6 +152,7 @@ const Signup = () => {
               onChange={handleInputChange}
               placeholder="Enter your email"
               className="mt-1"
+              disabled={isLoading || isSubmitting}
             />
           </div>
 
@@ -105,19 +160,21 @@ const Signup = () => {
             <Label htmlFor="password">Password</Label>
             <div className="relative mt-1">
               <Input
-                type={showPassword ? 'text' : 'password'}
+                type={showPassword ? "text" : "password"}
                 id="password"
                 name="password"
                 required
                 value={formData.password}
                 onChange={handleInputChange}
-                placeholder="Create a password"
+                placeholder="Enter your password"
                 className="pr-10"
+                disabled={isLoading || isSubmitting}
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
                 className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                disabled={isLoading || isSubmitting}
               >
                 {showPassword ? (
                   <EyeOff className="h-4 w-4 text-gray-400" />
@@ -132,7 +189,7 @@ const Signup = () => {
             <Label htmlFor="confirmPassword">Confirm Password</Label>
             <div className="relative mt-1">
               <Input
-                type={showConfirmPassword ? 'text' : 'password'}
+                type={showConfirmPassword ? "text" : "password"}
                 id="confirmPassword"
                 name="confirmPassword"
                 required
@@ -140,11 +197,13 @@ const Signup = () => {
                 onChange={handleInputChange}
                 placeholder="Confirm your password"
                 className="pr-10"
+                disabled={isLoading || isSubmitting}
               />
               <button
                 type="button"
                 onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                 className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                disabled={isLoading || isSubmitting}
               >
                 {showConfirmPassword ? (
                   <EyeOff className="h-4 w-4 text-gray-400" />
@@ -157,24 +216,24 @@ const Signup = () => {
 
           <Button
             type="submit"
-            disabled={isLoading}
-            className="w-full bg-gradient-to-r from-teal-500 to-coral-500 hover:from-teal-600 hover:to-coral-600 text-white"
+            className="w-full"
+            disabled={isLoading || isSubmitting}
           >
-            {isLoading ? 'Creating account...' : 'Create Account'}
+            {isLoading || isSubmitting
+              ? "Creating account..."
+              : "Create Account"}
           </Button>
-        </form>
 
-        <div className="mt-6 text-center">
-          <p className="text-gray-600">
-            Already have an account?{' '}
-            <Link 
-              to="/login" 
-              className="text-teal-600 hover:text-teal-700 font-semibold"
+          <p className="text-center text-sm text-gray-600">
+            Already have an account?{" "}
+            <Link
+              to="/login"
+              className="font-semibold text-teal-600 hover:text-teal-500"
             >
-              Sign in here
+              Sign in
             </Link>
           </p>
-        </div>
+        </form>
       </div>
     </div>
   );

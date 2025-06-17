@@ -6,7 +6,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Button } from '@/components/ui/button';
 import EventForm from '@/components/EventForm';
 import { useToast } from '@/hooks/use-toast';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from "@/hooks/use-auth";
 import { Plus } from 'lucide-react';
 
 const Home = () => {
@@ -77,7 +77,7 @@ const Home = () => {
     return true;
   });
 
-  const handleCreateEvent = async (formData: any) => {
+  const handleCreateEvent = async (formData) => {
     setIsSubmitting(true);
     
     // Simulate API call
