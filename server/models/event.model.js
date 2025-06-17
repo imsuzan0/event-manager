@@ -28,8 +28,8 @@ const eventSchema = new mongoose.Schema(
       enum: ["Tech", "Health", "Others"],
       default: "Others",
     },
-    image_url: {
-    type: String,
+    image_urls: {
+    type: [{ secure_url: String, public_id: String }],
     required: false,
     },
     phone_number: {

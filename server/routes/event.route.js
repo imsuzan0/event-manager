@@ -8,12 +8,19 @@ import {
   updateEvent,
 } from "../controllers/event.controller.js";
 import {
-  updateImage,
-  deleteImage,
-  uploadImage,
+  updateImages,
+  deleteImages,
+  uploadImages,
   upload,
 } from "../middlewares/cloudinary.middleware.js";
+import {
+  addComment,
+  updateComment,
+  deleteComment,
+  getEventComments,
+} from "../controllers/comment.controller.js";
 import { protectRoute } from "../middlewares/protectRoute.middleware.js";
+import { getEventLikes, likeUnlikeToggle } from "../controllers/like.controller.js";
 const router = express.Router();
 
 router.get("/", protectRoute, getallEvents);
@@ -22,17 +29,27 @@ router.get("/:id", protectRoute, getSingleEvent);
 router.post(
   "/create",
   protectRoute,
-  upload.single("image"),
-  uploadImage,
+  upload.array("images"),
+  uploadImages,
   createEvent
 );
 router.patch(
-  "/update:id",
+  "/update/:id",
   protectRoute,
-  upload.single("image"),
-  updateImage,
+  upload.array("images"),
+  updateImages,
   updateEvent
 );
-router.delete("/delete", protectRoute, deleteImage, deleteEvent);
+router.delete("/delete/:id", protectRoute, deleteImages, deleteEvent);
+
+// like
+router.post("/like/:eventId", protectRoute, likeUnlikeToggle);
+router.get("/likes/:eventId", getEventLikes);
+
+//comment
+router.post("/comment/create/:eventId", protectRoute, addComment);
+router.patch("/comment/update/:commentId", protectRoute, updateComment);
+router.delete("/comment/delete/:commentId", protectRoute, deleteComment);
+router.get("/comments/:eventId", getEventComments);
 
 export const eventRouter = router;

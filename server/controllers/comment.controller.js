@@ -1,9 +1,9 @@
 import { StatusCodes } from "http-status-codes";
-import {Comment} from "../models/comment.model.js";
+import { Comment } from "../models/comment.model.js";
 
 export const addComment = async (req, res) => {
   try {
-    const userId = req.user._id;
+    const userId = req.user.id;
     const { eventId } = req.params;
     const { commentText } = req.body;
 
@@ -14,7 +14,7 @@ export const addComment = async (req, res) => {
     const comment = await Comment.create({
       user_id: userId,
       event_id: eventId,
-      commentText,
+      text: commentText,
     });
     res.status(201).json({ msg: "Comment added successfully", comment });
   } catch (error) {
@@ -25,7 +25,7 @@ export const addComment = async (req, res) => {
 
 export const deleteComment = async (req, res) => {
   try {
-    const userId = req.user._id;
+    const userId = req.user.id;
     const { commentId } = req.params;
     const comment = await Comment.findById(commentId);
     if (!comment) {
@@ -39,7 +39,7 @@ export const deleteComment = async (req, res) => {
         .status(403)
         .json({ msg: "You are not authorized to delete this comment" });
     }
-    await comment.remove();
+    await Comment.findByIdAndDelete(commentId);
     res.status(200).json({ msg: "Comment removed successfully" });
   } catch (error) {
     console.log("Error in deleteComment controller: ", error);
@@ -51,7 +51,7 @@ export const updateComment = async (req, res) => {
   try {
     const { commentId } = req.params;
     const { commentText } = req.body;
-    const userId = req.user._id;
+    const userId = req.user.id;
 
     if (!commentText) {
       return res.status(400).json({ msg: "Comment text is required" });
@@ -70,9 +70,33 @@ export const updateComment = async (req, res) => {
         .json({ msg: "You are not authorized to update this comment" });
     }
 
-    comment.commentText = commentText;
-    await comment.save();
-    res.status(200).json({ msg: "Comment updated successfully", comment });
+    try {
+      const update = await Comment.updateOne(
+        { _id: commentId },
+        {
+          text: commentText,
+        }
+      );
+      if (update.matchedCount === 0) {
+        return res
+          .status(StatusCodes.NOT_FOUND)
+          .json({ msg: "Comment not found" });
+      } else if (update.modifiedCount === 0) {
+        return res
+          .status(StatusCodes.BAD_REQUEST)
+          .json({ msg: "No changes made to the comment" });
+      }
+
+      return res.status(StatusCodes.OK).json({
+        msg: "Comment updated successfully",
+        update: commentText,
+      });
+    } catch (error) {
+      console.error("Error updating the comment:", error);
+      return res
+        .status(StatusCodes.INTERNAL_SERVER_ERROR)
+        .json({ msg: "Error updating the comment" });
+    }
   } catch (error) {
     console.log("Error in updateComment controller: ", error);
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ msg: error.message });

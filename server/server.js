@@ -2,8 +2,6 @@ import express from "express";
 import dotenv from "dotenv";
 import { authRouter } from "./routes/auth.route.js";
 import { eventRouter } from "./routes/event.route.js";
-import { likeRouter } from "./routes/like.route.js";
-import { commentRouter } from "./routes/comment.route.js";
 import cookieParser from "cookie-parser";
 import connectDB from "./db/db.js";
 
@@ -18,8 +16,6 @@ const PORT = process.env.PORT || 3000;
 
 app.use("/api/auth", authRouter);
 app.use("/api/event", eventRouter);
-app.use("/api/events", likeRouter); // handles /api/events/:eventId/like etc.
-app.use("/api/events", commentRouter); // handles /api/events/:eventId/comment etc.
 
 const startServer = async () => {
   try {
