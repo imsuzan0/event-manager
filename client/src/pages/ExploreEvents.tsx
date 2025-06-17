@@ -1,12 +1,9 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
 import { Header } from "@/components/Header";
 import { EventFeed } from "@/components/EventFeed";
-import { PostEventModal } from "@/components/PostEventModal";
 import { Footer } from "@/components/Footer";
 
-const Index = () => {
-  const [isPostModalOpen, setIsPostModalOpen] = useState(false);
+const Explore = () => {
   const [events, setEvents] = useState([
     {
       id: 1,
@@ -75,17 +72,6 @@ const Index = () => {
     },
   ]);
 
-  const handlePostEvent = (newEvent: any) => {
-    const eventWithId = {
-      ...newEvent,
-      id: events.length + 1,
-      likes: 0,
-      comments: [],
-    };
-    setEvents([eventWithId, ...events]);
-    setIsPostModalOpen(false);
-  };
-
   const handleLike = (eventId: number) => {
     setEvents(
       events.map((event) =>
@@ -111,53 +97,34 @@ const Index = () => {
     );
   };
 
-  // Filter upcoming events only
-  const upcomingEvents = events.filter(
-    (event) => new Date(event.date) >= new Date()
+  // Sort events by date ascending
+  const sortedEvents = [...events].sort(
+    (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50">
-      <Header onPostEvent={() => setIsPostModalOpen(true)} />
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-pink-50">
+      <Header />
       <main className="container mx-auto px-4 py-8">
-        <div className="text-center mb-12">
-          <h1 className="text-4xl md:text-6xl font-bold text-gray-800 mb-4">
-            Discover Amazing <span className="text-blue-600">Events</span>
-          </h1>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            Connect with your community through exciting events in tech, health,
-            and more
-          </p>
-        </div>
+        <h1 className="text-4xl md:text-6xl font-bold text-gray-800 mb-8 text-center">
+          Explore All <span className="text-purple-600">Events</span>
+        </h1>
 
-        {upcomingEvents.length > 0 ? (
+        {events.length === 0 ? (
+          <p className="text-center text-red-600 text-xl font-semibold">
+            No events found.
+          </p>
+        ) : (
           <EventFeed
-            events={upcomingEvents}
+            events={sortedEvents}
             onLike={handleLike}
             onComment={handleComment}
           />
-        ) : (
-          <div className="text-center mt-10">
-            <p className="text-red-600 text-2xl font-semibold mb-4">
-              There are no upcoming events.
-            </p>
-            <Link
-              to="/explore"
-              className="inline-block bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-xl transition"
-            >
-              Go to Explore Events
-            </Link>
-          </div>
         )}
       </main>
       <Footer />
-      <PostEventModal
-        isOpen={isPostModalOpen}
-        onClose={() => setIsPostModalOpen(false)}
-        onSubmit={handlePostEvent}
-      />
     </div>
   );
 };
 
-export default Index;
+export default Explore;

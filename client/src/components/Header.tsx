@@ -21,13 +21,13 @@ export const Header = ({ onPostEvent }: HeaderProps) => {
           </div>
           
           <nav className="hidden md:flex items-center space-x-8">
-            <a href="#" className="text-gray-600 hover:text-blue-600 transition-colors font-medium">
+            <a href="/" className="text-gray-600 hover:text-blue-600 transition-colors font-medium">
               Home
             </a>
-            <a href="#" className="text-gray-600 hover:text-blue-600 transition-colors font-medium">
+            <a href="myevents" className="text-gray-600 hover:text-blue-600 transition-colors font-medium">
               My Events
             </a>
-            <a href="#" className="text-gray-600 hover:text-blue-600 transition-colors font-medium">
+            <a href="explore" className="text-gray-600 hover:text-blue-600 transition-colors font-medium">
               Explore
             </a>
           </nav>
