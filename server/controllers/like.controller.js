@@ -1,4 +1,4 @@
-import Like from "../models/like.model.js";
+import { Like } from "../models/like.model.js";
 import { StatusCodes } from "http-status-codes";
 
 export const likeUnlikeToggle = async (req, res) => {

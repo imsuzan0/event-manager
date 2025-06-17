@@ -1,12 +1,12 @@
 import { StatusCodes } from "http-status-codes";
-import Event from "../models/event.model.js";
+import {Event} from "../models/event.model.js";
 
 export const createEvent = async (req, res) => {
-  const { title, desc, date, location, tag } = req.body;
-  const userId = req.user._id;
+  const { title, desc, date, location, tag, phoneNumber } = req.body;
+  const userId = req.user.id;
   const imageUrl = req.image_secure_url;
 
-  if (!title || !desc || !date || !location || !tag) {
+  if (!title || !desc || !date || !location || !tag || !phoneNumber) {
     return res
       .status(StatusCodes.BAD_REQUEST)
       .json({ msg: "Please fill in all the required fields" });
@@ -19,6 +19,7 @@ export const createEvent = async (req, res) => {
       date,
       location,
       tag,
+      phone_number: phoneNumber,
       image_url: imageUrl,
     });
     return res.status(StatusCodes.CREATED).json({
@@ -36,7 +37,7 @@ export const createEvent = async (req, res) => {
 export const updateEvent = async (req, res) => {
   const { id } = req.params;
   const imageUrl = req.image_secure_url;
-  const userId = req.user._id;
+  const userId = req.user.id;
   const { title, desc, date, location, tag } = req.body;
 
   const event = await Event.findById(id);
@@ -73,11 +74,11 @@ export const updateEvent = async (req, res) => {
     }
 
     return res.status(StatusCodes.OK).json({
-      msg: "Product updated successfully",
+      msg: "Event updated successfully",
       event,
     });
   } catch (error) {
-    console.error("Error updating the product:", error);
+    console.error("Error updating the event:", error);
     return res
       .status(StatusCodes.INTERNAL_SERVER_ERROR)
       .json({ msg: "Error updating the event" });
@@ -88,7 +89,7 @@ export const deleteEvent = async (req, res) => {
   try {
     const { id } = req.params;
     const event = await Event.findById(id);
-    const userId = req.user._id;
+    const userId = req.user.id;
     if (!event) {
       return res.status(StatusCodes.NOT_FOUND).json({ msg: "Event not found" });
     }
@@ -139,13 +140,15 @@ export const getMyEvents = async (req, res) => {
     const userId = req.user.id;
     console.log(userId);
 
-    const events = await Event.find({ "_id": userId });
+    const events = await Event.find({ user_id: userId });
     if (events.length === 0) {
       return res.status(200).json({ msg: "You have no posts yet" });
     }
 
     return res.json(events);
   } catch (error) {
-    res.status(500).json({ msg: "Internal Server Error", error: error.message });
+    res
+      .status(500)
+      .json({ msg: "Internal Server Error", error: error.message });
   }
 };
