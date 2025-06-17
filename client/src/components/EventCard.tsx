@@ -1,111 +1,144 @@
-
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Calendar, MapPin, Phone, Heart, MessageCircle, Send } from 'lucide-react';
-import { Event } from '@/types/Event';
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { Calendar, MapPin, Phone, Heart, MessageCircle } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import type { Event } from "@/types/event";
+import { useAuth } from "@/hooks/use-auth";
+import { useToast } from "@/hooks/use-toast";
 
 interface EventCardProps {
   event: Event;
-  onLike: (eventId: string) => void;
-  onComment: (eventId: string, comment: string) => void;
+  onRefresh?: () => void;
 }
 
-const EventCard = ({ event, onLike, onComment }: EventCardProps) => {
-  const [liked, setLiked] = useState(false);
+const EventCard = ({ event, onRefresh }: EventCardProps) => {
+  const [isLiked, setIsLiked] = useState(false);
+  const [showComments, setShowComments] = useState(false);
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const { toast } = useToast();
 
-  const handleLike = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (!liked) {
-      onLike(event.id);
-      setLiked(true);
+  const handleLike = () => {
+    if (!user) {
+      toast({
+        title: "Login Required",
+        description: "Please login to like events",
+        variant: "default",
+      });
+      return;
     }
+    setIsLiked(!isLiked);
   };
 
-  const handleCardClick = () => {
-    navigate(`/event/${event.id}`);
-  };
-
-  const getTagColor = (tag: string) => {
-    switch (tag) {
-      case 'Tech': return 'bg-blue-100 text-blue-800';
-      case 'Health': return 'bg-green-100 text-green-800';
-      case 'Others': return 'bg-purple-100 text-purple-800';
-      default: return 'bg-gray-100 text-gray-800';
+  const handleComment = () => {
+    if (!user) {
+      toast({
+        title: "Login Required",
+        description: "Please login to comment on events",
+        variant: "default",
+      });
+      return;
     }
-  };
-
-  const formatDate = (date: Date) => {
-    return new Intl.DateTimeFormat('en-US', {
-      weekday: 'short',
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
-    }).format(date);
+    setShowComments(!showComments);
   };
 
   return (
-    <div 
-      onClick={handleCardClick}
-      className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden group cursor-pointer"
-    >
-      <div className="relative overflow-hidden">
+    <div className="bg-white rounded-lg shadow-md overflow-hidden">
+      <div className="relative">
         <img
-          src={event.image}
+          src={event.image_urls?.[0] || "/placeholder.svg"}
           alt={event.title}
-          className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+          className="w-full h-48 object-cover"
         />
-        <div className="absolute top-4 right-4">
-          <span className={`px-3 py-1 rounded-full text-sm font-medium ${getTagColor(event.tags)}`}>
-            {event.tags}
-          </span>
+        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black to-transparent p-4">
+          <h3 className="text-xl font-semibold text-white">{event.title}</h3>
+          <div className="flex items-center text-white/80 mt-1">
+            <span className="text-sm px-2 py-1 bg-teal-500/80 rounded-full">
+              {event.tag}
+            </span>
+          </div>
         </div>
       </div>
 
-      <div className="p-6">
-        <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-teal-600 transition-colors">
-          {event.title}
-        </h3>
-        
-        <p className="text-gray-600 mb-4 line-clamp-2">
-          {event.description}
-        </p>
+      <div className="p-4">
+        <p className="text-gray-600 text-sm mb-4 line-clamp-2">{event.desc}</p>
 
-        <div className="space-y-2 mb-4">
-          <div className="flex items-center text-gray-500">
+        <div className="space-y-2">
+          <div className="flex items-center text-gray-600">
             <Calendar className="h-4 w-4 mr-2" />
-            <span className="text-sm">{formatDate(event.date)}</span>
+            <span className="text-sm">
+              {new Date(event.date).toLocaleDateString()}
+            </span>
           </div>
-          <div className="flex items-center text-gray-500">
+
+          <div className="flex items-center text-gray-600">
             <MapPin className="h-4 w-4 mr-2" />
             <span className="text-sm">{event.location}</span>
           </div>
-          <div className="flex items-center text-gray-500">
+
+          <div className="flex items-center text-gray-600">
             <Phone className="h-4 w-4 mr-2" />
-            <span className="text-sm">{event.phoneNumber}</span>
+            <span className="text-sm">{event.phone_number}</span>
           </div>
         </div>
 
-        <div className="flex items-center justify-between pt-4 border-t border-gray-100">
-          <div className="flex items-center space-x-4">
+        <div className="flex justify-between items-center mt-4 pt-4 border-t">
+          <div className="flex space-x-4">
             <button
               onClick={handleLike}
-              className={`flex items-center space-x-1 px-3 py-1 rounded-full transition-all ${
-                liked 
-                  ? 'bg-red-100 text-red-600' 
-                  : 'hover:bg-gray-100 text-gray-600'
+              className={`flex items-center text-gray-500 hover:text-teal-500 transition-colors ${
+                isLiked ? "text-teal-500" : ""
               }`}
             >
-              <Heart className={`h-4 w-4 ${liked ? 'fill-current' : ''}`} />
-              <span className="text-sm">{event.likes}</span>
+              <Heart
+                className={`h-4 w-4 mr-1 ${isLiked ? "fill-current" : ""}`}
+              />
+              <span className="text-sm">
+                {(event.likes || 0) + (isLiked ? 1 : 0)}
+              </span>
             </button>
-            
-            <div className="flex items-center space-x-1 px-3 py-1 rounded-full text-gray-600">
-              <MessageCircle className="h-4 w-4" />
-              <span className="text-sm">{event.comments.length}</span>
+
+            <button
+              onClick={handleComment}
+              className="flex items-center text-gray-500 hover:text-teal-500 transition-colors"
+            >
+              <MessageCircle className="h-4 w-4 mr-1" />
+              <span className="text-sm">{event.comments?.length || 0}</span>
+            </button>
+          </div>
+
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => navigate(`/events/${event._id}`)}
+          >
+            View Details
+          </Button>
+        </div>
+
+        {/* Comments section */}
+        {showComments && event.comments && event.comments.length > 0 && (
+          <div className="mt-4 pt-4 border-t">
+            <h4 className="text-sm font-semibold text-gray-900 mb-2">
+              Comments
+            </h4>
+            <div className="space-y-2">
+              {event.comments.map((comment) => (
+                <div key={comment.id} className="flex items-start space-x-2">
+                  <div className="w-8 h-8 rounded-full bg-teal-100 flex items-center justify-center text-teal-600 text-sm font-medium">
+                    {comment.avatar || comment.author[0]}
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-gray-900">
+                      {comment.author}
+                    </p>
+                    <p className="text-sm text-gray-600">{comment.text}</p>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );

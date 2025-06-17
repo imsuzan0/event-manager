@@ -1,4 +1,3 @@
-
 export interface Comment {
   id: string;
   author: string;
@@ -7,16 +6,15 @@ export interface Comment {
 }
 
 export interface Event {
-  id: string;
+  _id: string;
+  user_id: string;
   title: string;
-  description: string;
+  desc: string;
+  date: string;
   location: string;
-  date: Date; // Keep for backward compatibility
-  startDate?: Date; // New optional field
-  endDate?: Date; // New optional field
-  image?: string;
-  tags: 'Tech' | 'Health' | 'Others';
-  phoneNumber: string;
-  likes: number;
-  comments: Comment[];
+  tag: "Tech" | "Health" | "Others";
+  phone_number: string;
+  image_urls: string[];
+  likes?: number;
+  comments?: Comment[];
 }
