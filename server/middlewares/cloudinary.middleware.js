@@ -5,20 +5,23 @@ import cloudinary from "../utils/cloudinary.connection.js"
 const storage = multer.memoryStorage();
 export const upload = multer({ storage });
 
+export const uploadMultiple = upload.array("images", 10)
+
 //cloudinary
 //upload image
-export const uploadImage = async (req, res, next) => {
+export const uploadImages = async (req, res, next) => {
   try {
-    const file = req.file; // Get the file from the request
+    const files = req.files;
 
-    if (!file) {
-      // return res.status(400).json({ message: "No file uploaded" });
-      return next()
+    if (!files || files.length === 0) {
+      return next(); // No images provided
     }
 
-    // Upload the image to Cloudinary
-    cloudinary.uploader
-      .upload_stream(
+    const uploadedImages = [];
+    let pending = files.length;
+
+    files.forEach((file) => {
+      const stream = cloudinary.uploader.upload_stream(
         {
           folder: "real",
           resource_type: "image",
@@ -26,100 +29,97 @@ export const uploadImage = async (req, res, next) => {
         (error, result) => {
           if (error) {
             console.error("Cloudinary Upload Error:", error);
-            return res
-              .status(500)
-              .json({ message: "Failed to upload image to Cloudinary", error });
+            return res.status(500).json({
+              message: "Failed to upload image to Cloudinary",
+              error,
+            });
           }
-          req.image_secure_url = result.secure_url;
-          req.public_id=result.public_id 
-          next();
+
+          uploadedImages.push({
+            secure_url: result.secure_url,
+            public_id: result.public_id,
+          });
+
+          pending--;
+
+          if (pending === 0) {
+            req.uploadedImages = uploadedImages;
+            next();
+          }
         }
-      )
-      .end(file.buffer);
+      );
+
+      stream.end(file.buffer);
+    });
   } catch (error) {
     console.error("Upload Error:", error);
-    res
-      .status(500)
-      .json({ message: "An error occurred during the upload", error });
+    res.status(500).json({
+      message: "An error occurred during the upload",
+      error,
+    });
   }
 };
 
 //update image
-export const updateImage = async (req, res, next) => {
+export const updateImages = async (req, res, next) => {
   try {
-    const { public_id } = req.body; // Assuming the client sends the public_id of the current image
-    const file = req.file; // Get the new file to replace the old one
+    const files = req.files;
+    const publicIds = JSON.parse(req.body.public_ids || "[]");
 
-    if (!file) {
-      // return res.status(400).json({ message: "No new file uploaded" });
-      return next()
+    if (!files || files.length === 0) return next();
+
+    // First delete old images
+    for (const id of publicIds) {
+      await cloudinary.uploader.destroy(id);
     }
 
-    // First, delete the existing image using its public_id
-    cloudinary.uploader.destroy(public_id, (error, result) => {
-      if (error) {
-        console.error("Cloudinary Deletion Error:", error);
-        return res.status(500).json({
-          message: "Failed to delete the previous image from Cloudinary",
-          error,
-        });
-      }
-
-      // After deleting, upload the new image
-      cloudinary.uploader
-        .upload_stream(
+    // Then upload new images
+    const uploadPromises = files.map((file) => {
+      return new Promise((resolve, reject) => {
+        const stream = cloudinary.uploader.upload_stream(
           {
             folder: "real",
             resource_type: "image",
           },
           (error, result) => {
-            if (error) {
-              console.error("Cloudinary Upload Error:", error);
-              return res.status(500).json({
-                message: "Failed to upload new image to Cloudinary",
-                error,
-              });
-            }
-
-            req.image_secure_url = result.secure_url;
-            req.public_id=result.public_id 
-            next();
+            if (error) return reject(error);
+            resolve({
+              secure_url: result.secure_url,
+              public_id: result.public_id,
+            });
           }
-        )
-        .end(file.buffer);
+        );
+        stream.end(file.buffer);
+      });
     });
+
+    const results = await Promise.all(uploadPromises);
+    req.uploadedImages = results; // use in controller
+    next();
   } catch (error) {
-    console.error("Update Error:", error);
-    res
-      .status(500)
-      .json({ message: "An error occurred during the update", error });
+    console.error("Update Images Error:", error);
+    res.status(500).json({ message: "Failed to update images", error });
   }
 };
 
 //delete image
-export const deleteImage = async (req, res, next) => {
+export const deleteImages = async (req, res, next) => {
   try {
-    const { public_id } = req.body; // Assuming the client sends the public_id of the image to be deleted
+    const publicIds = JSON.parse(req.body.public_ids || "[]");
 
-    if (!public_id) {
-      // return res.status(400).json({ message: "No public_id provided" });
+    if (!Array.isArray(publicIds) || publicIds.length === 0) {
       return next();
     }
 
-    // Delete the image from Cloudinary using its public_id
-    cloudinary.uploader.destroy(public_id, (error, result) => {
-      if (error) {
-        console.error("Cloudinary Deletion Error:", error);
-        return res
-          .status(500)
-          .json({ message: "Failed to delete image from Cloudinary", error });
-      }
-      next();
-    });
+    const deletePromises = publicIds.map(id =>
+      cloudinary.uploader.destroy(id)
+    );
+
+    await Promise.all(deletePromises);
+
+    next();
   } catch (error) {
-    console.error("Deletion Error:", error);
-    res
-      .status(500)
-      .json({ message: "An error occurred during the deletion", error });
+    console.error("Delete Images Error:", error);
+    res.status(500).json({ message: "Failed to delete images", error });
   }
 };

@@ -8,9 +8,9 @@ import {
   updateEvent,
 } from "../controllers/event.controller.js";
 import {
-  updateImage,
-  deleteImage,
-  uploadImage,
+  updateImages,
+  deleteImages,
+  uploadImages,
   upload,
 } from "../middlewares/cloudinary.middleware.js";
 import {
@@ -29,18 +29,18 @@ router.get("/:id", protectRoute, getSingleEvent);
 router.post(
   "/create",
   protectRoute,
-  upload.single("image"),
-  uploadImage,
+  upload.array("images"),
+  uploadImages,
   createEvent
 );
 router.patch(
   "/update/:id",
   protectRoute,
-  upload.single("image"),
-  updateImage,
+  upload.array("images"),
+  updateImages,
   updateEvent
 );
-router.delete("/delete/:id", protectRoute, deleteImage, deleteEvent);
+router.delete("/delete/:id", protectRoute, deleteImages, deleteEvent);
 
 // like
 router.post("/like/:eventId", protectRoute, likeUnlikeToggle);

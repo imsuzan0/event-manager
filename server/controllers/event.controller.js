@@ -4,7 +4,8 @@ import {Event} from "../models/event.model.js";
 export const createEvent = async (req, res) => {
   const { title, desc, date, location, tag, phoneNumber } = req.body;
   const userId = req.user.id;
-  const imageUrl = req.image_secure_url;
+  const images = req.uploadedImages || [];
+  const imageUrls = images.map(img => img.secure_url);
 
   if (!title || !desc || !date || !location || !tag || !phoneNumber) {
     return res
@@ -20,7 +21,7 @@ export const createEvent = async (req, res) => {
       location,
       tag,
       phone_number: phoneNumber,
-      image_url: imageUrl,
+      image_urls: imageUrls,
     });
     return res.status(StatusCodes.CREATED).json({
       msg: "Event created successfully",
@@ -36,9 +37,11 @@ export const createEvent = async (req, res) => {
 
 export const updateEvent = async (req, res) => {
   const { id } = req.params;
-  const imageUrl = req.image_secure_url;
   const userId = req.user.id;
   const { title, desc, date, location, tag } = req.body;
+
+  const images = req.uploadedImages || [];
+  const imageUrls = images.map(img => img.secure_url);
 
   const event = await Event.findById(id);
   if (!event) {
@@ -62,7 +65,7 @@ export const updateEvent = async (req, res) => {
           date,
           location,
           tag,
-          image_url: imageUrl,
+          image_urls: imageUrls,
         },
       }
     );
