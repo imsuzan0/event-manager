@@ -38,9 +38,7 @@ const EventCard = ({ event, onRefresh }: EventCardProps) => {
 
   const handleCardAction = (action: "like" | "comment") => {
     navigate(
-      `/events/${event._id}${
-        action === "comment" ? "#comments-section" : ""
-      }`
+      `/events/${event._id}${action === "comment" ? "#comments-section" : ""}`
     );
   };
 
