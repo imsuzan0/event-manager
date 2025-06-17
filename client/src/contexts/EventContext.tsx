@@ -73,13 +73,10 @@ export const EventProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const deleteEvent = async (id: string) => {
     try {
-      const response = await fetch(
-        `${serverUrl}/event/delete/${id}`,
-        {
-          method: "DELETE",
-          credentials: "include",
-        }
-      );
+      const response = await fetch(`${serverUrl}/event/delete/${id}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
 
       if (!response.ok) {
         const errorData = await response.json();
@@ -93,12 +90,9 @@ export const EventProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const getAllEvents = async () => {
     try {
-      const response = await fetch(
-        `${serverUrl}/event/`,
-        {
-          credentials: "include",
-        }
-      );
+      const response = await fetch(`${serverUrl}/event`, {
+        credentials: "include",
+      });
 
       if (!response.ok) {
         const errorData = await response.json();
@@ -115,12 +109,9 @@ export const EventProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const getEvent = async (id: string) => {
     try {
-      const response = await fetch(
-        `${serverUrl}/event/${id}`,
-        {
-          credentials: "include",
-        }
-      );
+      const response = await fetch(`${serverUrl}/event/${id}`, {
+        credentials: "include",
+      });
 
       if (!response.ok) {
         const errorData = await response.json();
@@ -137,12 +128,9 @@ export const EventProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const getMyEvents = async () => {
     try {
-      const response = await fetch(
-        `${serverUrl}/event/myevents`,
-        {
-          credentials: "include",
-        }
-      );
+      const response = await fetch(`${serverUrl}/event/myevents`, {
+        credentials: "include",
+      });
 
       if (!response.ok) {
         const errorData = await response.json();
@@ -157,6 +145,139 @@ export const EventProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   };
 
+  const toggleLike = async (eventId: string) => {
+    try {
+      const response = await fetch(`${serverUrl}/event/like/${eventId}`, {
+        method: "POST",
+        credentials: "include",
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.msg || "Failed to toggle like");
+      }
+
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error("Error toggling like:", error);
+      throw error;
+    }
+  };
+
+  const getEventLikes = async (eventId: string) => {
+    try {
+      const response = await fetch(`${serverUrl}/event/likes/${eventId}`, {
+        credentials: "include",
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.msg || "Failed to fetch likes");
+      }
+
+      const { likes } = await response.json();
+      return likes;
+    } catch (error) {
+      console.error("Error fetching likes:", error);
+      throw error;
+    }
+  };
+
+  const addComment = async (eventId: string, commentText: string) => {
+    try {
+      const response = await fetch(
+        `${serverUrl}/event/comment/create/${eventId}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ commentText }),
+          credentials: "include",
+        }
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.msg || "Failed to add comment");
+      }
+
+      const { comment } = await response.json();
+      return comment;
+    } catch (error) {
+      console.error("Error adding comment:", error);
+      throw error;
+    }
+  };
+
+  const updateComment = async (commentId: string, commentText: string) => {
+    try {
+      const response = await fetch(
+        `${serverUrl}/event/comment/update/${commentId}`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ commentText }),
+          credentials: "include",
+        }
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.msg || "Failed to update comment");
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error("Error updating comment:", error);
+      throw error;
+    }
+  };
+
+  const deleteComment = async (commentId: string) => {
+    try {
+      const response = await fetch(
+        `${serverUrl}/event/comment/delete/${commentId}`,
+        {
+          method: "DELETE",
+          credentials: "include",
+        }
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.msg || "Failed to delete comment");
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error("Error deleting comment:", error);
+      throw error;
+    }
+  };
+
+  const getEventComments = async (eventId: string) => {
+    try {
+      const response = await fetch(`${serverUrl}/event/comments/${eventId}`, {
+        credentials: "include",
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.msg || "Failed to fetch comments");
+      }
+
+      const { comments } = await response.json();
+      return comments;
+    } catch (error) {
+      console.error("Error fetching comments:", error);
+      throw error;
+    }
+  };
+
   return (
     <EventContext.Provider
       value={{
@@ -166,6 +287,12 @@ export const EventProvider: React.FC<{ children: React.ReactNode }> = ({
         getAllEvents,
         getEvent,
         getMyEvents,
+        toggleLike,
+        getEventLikes,
+        addComment,
+        updateComment,
+        deleteComment,
+        getEventComments,
       }}
     >
       {children}

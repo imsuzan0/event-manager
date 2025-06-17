@@ -1,15 +1,50 @@
-import { useState, useEffect, useCallback } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { Calendar, MapPin, Phone, Heart, MessageCircle, Send, ArrowLeft } from 'lucide-react';
-import type { Event } from '@/types/event';
-import { useEvent } from '@/contexts/event-context';
-import { useAuth } from '@/hooks/use-auth';
-import { useToast } from '@/hooks/use-toast';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Loader2 } from 'lucide-react';
-import { format } from 'date-fns';
+import { useState, useEffect, useCallback } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import {
+  Calendar,
+  MapPin,
+  Phone,
+  Heart,
+  MessageCircle,
+  Send,
+  ArrowLeft,
+  Edit,
+  Trash2,
+  X,
+} from "lucide-react";
+import type { Event } from "@/types/event";
+import { useEvent } from "@/contexts/event-context";
+import { useAuth } from "@/hooks/use-auth";
+import { useToast } from "@/hooks/use-toast";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Loader2 } from "lucide-react";
+import { format } from "date-fns";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+
+interface Comment {
+  _id: string;
+  user_id: {
+    _id: string;
+    fullName: string;
+    email: string;
+  };
+  event_id: string;
+  text: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
 
 const EventDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -17,11 +52,50 @@ const EventDetail = () => {
   const [event, setEvent] = useState<Event | null>(null);
   const [loading, setLoading] = useState(true);
   const [liked, setLiked] = useState(false);
-  const [commentText, setCommentText] = useState('');
+  const [likesCount, setLikesCount] = useState(0);
+  const [comments, setComments] = useState<Comment[]>([]);
+  const [commentText, setCommentText] = useState("");
+  const [editingComment, setEditingComment] = useState<string | null>(null);
+  const [editText, setEditText] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { getEvent } = useEvent();
+  const {
+    getEvent,
+    toggleLike,
+    getEventLikes,
+    addComment,
+    updateComment,
+    deleteComment,
+    getEventComments,
+  } = useEvent();
   const { user } = useAuth();
   const { toast } = useToast();
+
+  const fetchLikes = useCallback(async () => {
+    if (!id) return;
+    try {
+      const response = await getEventLikes(id);
+      const eventLikes = Array.isArray(response) ? response : [];
+      setLikesCount(eventLikes.length);
+      if (user) {
+        setLiked(eventLikes.some((like) => like.user_id._id === user.id));
+      }
+    } catch (error) {
+      console.error("Error fetching likes:", error);
+      setLikesCount(0);
+      setLiked(false);
+    }
+  }, [id, getEventLikes, user]);
+
+  const fetchComments = useCallback(async () => {
+    if (!id) return;
+    try {
+      const eventComments = await getEventComments(id);
+      setComments(eventComments);
+    } catch (error) {
+      console.error("Error fetching comments:", error);
+      setComments([]);
+    }
+  }, [id, getEventComments]);
 
   const fetchEvent = useCallback(async () => {
     if (!id) return;
@@ -29,33 +103,44 @@ const EventDetail = () => {
       setLoading(true);
       const fetchedEvent = await getEvent(id);
       setEvent(fetchedEvent);
+      await Promise.all([fetchLikes(), fetchComments()]);
     } catch (error) {
       toast({
         title: "Error",
         description: "Failed to load event details",
         variant: "destructive",
       });
-      navigate('/');
+      navigate("/");
     } finally {
       setLoading(false);
     }
-  }, [id, getEvent, toast, navigate]);
+  }, [id, getEvent, toast, navigate, fetchLikes, fetchComments]);
 
   useEffect(() => {
     fetchEvent();
   }, [fetchEvent]);
 
-  const handleLike = () => {
-    if (!user) {
+  const handleLike = async () => {
+    if (!user || !id) {
       toast({
         title: "Login Required",
         description: "Please login to like events",
         variant: "default",
       });
+      navigate("/login");
       return;
     }
-    // TODO: Implement like functionality with backend
-    setLiked(!liked);
+
+    try {
+      await toggleLike(id);
+      await fetchLikes();
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to update like",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleSubmitComment = async (e: React.FormEvent) => {
@@ -80,22 +165,10 @@ const EventDetail = () => {
 
     setIsSubmitting(true);
     try {
-      // TODO: Implement comment functionality with backend
-      const newComment = {
-        id: Date.now().toString(),
-        author: user.name || 'Anonymous',
-        text: commentText.trim(),
-        avatar: user.name?.[0] || 'A'
-      };
-      
-      if (event) {
-        setEvent({
-          ...event,
-          comments: [...(event.comments || []), newComment]
-        });
-      }
-      
-      setCommentText('');
+      if (!id) return;
+      await addComment(id, commentText.trim());
+      await fetchComments();
+      setCommentText("");
       toast({
         title: "Success",
         description: "Comment added successfully",
@@ -111,8 +184,59 @@ const EventDetail = () => {
     }
   };
 
+  const handleUpdateComment = async (commentId: string) => {
+    if (!editText.trim()) {
+      toast({
+        title: "Error",
+        description: "Please enter a comment",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      await updateComment(commentId, editText.trim());
+      await fetchComments();
+      setEditingComment(null);
+      setEditText("");
+      toast({
+        title: "Success",
+        description: "Comment updated successfully",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to update comment",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleDeleteComment = async (commentId: string) => {
+    setIsSubmitting(true);
+    try {
+      await deleteComment(commentId);
+      await fetchComments();
+      toast({
+        title: "Success",
+        description: "Comment deleted successfully",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to delete comment",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   const formatEventDate = (dateStr: string) => {
-    return format(new Date(dateStr), 'PPPP');  // "Monday, April 29th, 2023"
+    return format(new Date(dateStr), "PPPP"); // "Monday, April 29th, 2023"
   };
 
   if (loading) {
@@ -130,9 +254,17 @@ const EventDetail = () => {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Event not found</h2>
-          <p className="text-gray-600 mb-4">The event you're looking for doesn't exist or has been removed.</p>
-          <Button onClick={() => navigate('/')} variant="outline" className="inline-flex items-center">
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">
+            Event not found
+          </h2>
+          <p className="text-gray-600 mb-4">
+            The event you're looking for doesn't exist or has been removed.
+          </p>
+          <Button
+            onClick={() => navigate("/")}
+            variant="outline"
+            className="inline-flex items-center"
+          >
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back to Events
           </Button>
@@ -167,7 +299,9 @@ const EventDetail = () => {
         <div className="bg-white rounded-xl shadow-md p-6 mb-8">
           <div className="flex justify-between items-start mb-4">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">{event.title}</h1>
+              <h1 className="text-3xl font-bold text-gray-900 mb-2">
+                {event.title}
+              </h1>
               <span className="inline-block px-3 py-1 rounded-full text-sm font-medium bg-teal-100 text-teal-800">
                 {event.tag}
               </span>
@@ -176,18 +310,22 @@ const EventDetail = () => {
               <button
                 onClick={handleLike}
                 className={`flex items-center space-x-1 text-gray-500 hover:text-teal-500 transition-colors ${
-                  liked ? 'text-teal-500' : ''
+                  liked ? "text-teal-500" : ""
                 }`}
               >
-                <Heart className={`h-6 w-6 ${liked ? 'fill-current' : ''}`} />
-                <span>{(event.likes || 0) + (liked ? 1 : 0)}</span>
+                <Heart className={`h-6 w-6 ${liked ? "fill-current" : ""}`} />
+                <span>{likesCount}</span>
               </button>
               <button
-                onClick={() => document.getElementById('comments-section')?.scrollIntoView({ behavior: 'smooth' })}
+                onClick={() =>
+                  document
+                    .getElementById("comments-section")
+                    ?.scrollIntoView({ behavior: "smooth" })
+                }
                 className="flex items-center space-x-1 text-gray-500 hover:text-teal-500 transition-colors"
               >
                 <MessageCircle className="h-6 w-6" />
-                <span>{event.comments?.length || 0}</span>
+                <span>{comments.length}</span>
               </button>
             </div>
           </div>
@@ -213,9 +351,12 @@ const EventDetail = () => {
         </div>
 
         {/* Comments Section */}
-        <div id="comments-section" className="bg-white rounded-xl shadow-md p-6">
+        <div
+          id="comments-section"
+          className="bg-white rounded-xl shadow-md p-6"
+        >
           <h2 className="text-xl font-semibold text-gray-900 mb-6">
-            Comments {event.comments?.length ? `(${event.comments.length})` : ''}
+            Comments {comments.length ? `(${comments.length})` : ""}
           </h2>
 
           {/* Comment Form */}
@@ -228,7 +369,7 @@ const EventDetail = () => {
                 className="flex-1"
                 disabled={isSubmitting || !user}
               />
-              <Button 
+              <Button
                 type="submit"
                 disabled={isSubmitting || !user}
                 className="self-end"
@@ -248,37 +389,124 @@ const EventDetail = () => {
             </div>
             {!user && (
               <p className="mt-2 text-sm text-gray-500">
-                Please{' '}
+                Please{" "}
                 <button
                   type="button"
-                  onClick={() => navigate('/login')}
+                  onClick={() => navigate("/login")}
                   className="text-teal-600 hover:text-teal-500 font-medium"
                 >
                   login
-                </button>
-                {' '}to comment
+                </button>{" "}
+                to comment
               </p>
             )}
           </form>
 
           {/* Comments List */}
           <div className="space-y-6">
-            {event.comments && event.comments.length > 0 ? (
-              event.comments.map((comment) => (
-                <div key={comment.id} className="flex space-x-3">
+            {comments.length > 0 ? (
+              comments.map((comment) => (
+                <div key={comment._id} className="flex space-x-3">
                   <div className="flex-shrink-0">
                     <div className="w-10 h-10 rounded-full bg-teal-100 flex items-center justify-center text-teal-600 font-medium">
-                      {comment.avatar || comment.author[0]}
+                      {comment.user_id.fullName[0]}
                     </div>
                   </div>
-                  <div>
-                    <div className="text-sm font-medium text-gray-900">{comment.author}</div>
-                    <div className="mt-1 text-gray-700">{comment.text}</div>
+                  <div className="flex-grow">
+                    <div className="flex items-center justify-between">
+                      <div className="text-sm font-medium text-gray-900">
+                        {comment.user_id.fullName}
+                      </div>
+                      {user && comment.user_id._id === user.id && (
+                        <div className="flex items-center space-x-2">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => {
+                              setEditingComment(comment._id);
+                              setEditText(comment.text);
+                            }}
+                            className="text-gray-500 hover:text-teal-500"
+                          >
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="text-gray-500 hover:text-red-500"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>
+                                  Delete Comment
+                                </AlertDialogTitle>
+                                <AlertDialogDescription>
+                                  Are you sure you want to delete this comment?
+                                  This action cannot be undone.
+                                </AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter>
+                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                <AlertDialogAction
+                                  onClick={() =>
+                                    handleDeleteComment(comment._id)
+                                  }
+                                  className="bg-red-500 hover:bg-red-600"
+                                >
+                                  Delete
+                                </AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
+                        </div>
+                      )}
+                    </div>
+                    {editingComment === comment._id ? (
+                      <div className="mt-2">
+                        <Textarea
+                          value={editText}
+                          onChange={(e) => setEditText(e.target.value)}
+                          className="mb-2"
+                        />
+                        <div className="flex justify-end space-x-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                              setEditingComment(null);
+                              setEditText("");
+                            }}
+                          >
+                            Cancel
+                          </Button>
+                          <Button
+                            size="sm"
+                            onClick={() => handleUpdateComment(comment._id)}
+                            disabled={isSubmitting}
+                          >
+                            {isSubmitting ? (
+                              <Loader2 className="h-4 w-4 animate-spin" />
+                            ) : (
+                              "Save"
+                            )}
+                          </Button>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="mt-1 text-gray-700">{comment.text}</div>
+                    )}
                   </div>
                 </div>
               ))
             ) : (
-              <p className="text-gray-500 text-center py-4">No comments yet. Be the first to comment!</p>
+              <p className="text-gray-500 text-center py-4">
+                No comments yet. Be the first to comment!
+              </p>
             )}
           </div>
         </div>

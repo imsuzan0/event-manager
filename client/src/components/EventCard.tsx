@@ -1,10 +1,9 @@
-import { useState } from "react";
+import { useEffect, useCallback, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Calendar, MapPin, Phone, Heart, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { Event } from "@/types/event";
-import { useAuth } from "@/hooks/use-auth";
-import { useToast } from "@/hooks/use-toast";
+import { useEvent } from "@/contexts/event-context";
 
 interface EventCardProps {
   event: Event;
@@ -12,34 +11,37 @@ interface EventCardProps {
 }
 
 const EventCard = ({ event, onRefresh }: EventCardProps) => {
-  const [isLiked, setIsLiked] = useState(false);
-  const [showComments, setShowComments] = useState(false);
   const navigate = useNavigate();
-  const { user } = useAuth();
-  const { toast } = useToast();
+  const { getEventLikes, getEventComments } = useEvent();
+  const [likesCount, setLikesCount] = useState(0);
+  const [commentsCount, setCommentsCount] = useState(0);
 
-  const handleLike = () => {
-    if (!user) {
-      toast({
-        title: "Login Required",
-        description: "Please login to like events",
-        variant: "default",
-      });
-      return;
-    }
-    setIsLiked(!isLiked);
-  };
+  const fetchCounts = useCallback(async () => {
+    try {
+      const [likes, comments] = await Promise.all([
+        getEventLikes(event._id),
+        getEventComments(event._id),
+      ]);
 
-  const handleComment = () => {
-    if (!user) {
-      toast({
-        title: "Login Required",
-        description: "Please login to comment on events",
-        variant: "default",
-      });
-      return;
+      setLikesCount(Array.isArray(likes) ? likes.length : 0);
+      setCommentsCount(Array.isArray(comments) ? comments.length : 0);
+    } catch (error) {
+      console.error("Error fetching counts:", error);
+      setLikesCount(0);
+      setCommentsCount(0);
     }
-    setShowComments(!showComments);
+  }, [event._id, getEventLikes, getEventComments]);
+
+  useEffect(() => {
+    fetchCounts();
+  }, [fetchCounts]);
+
+  const handleCardAction = (action: "like" | "comment") => {
+    navigate(
+      `/events/${event._id}${
+        action === "comment" ? "#comments-section" : ""
+      }`
+    );
   };
 
   return (
@@ -85,25 +87,19 @@ const EventCard = ({ event, onRefresh }: EventCardProps) => {
         <div className="flex justify-between items-center mt-4 pt-4 border-t">
           <div className="flex space-x-4">
             <button
-              onClick={handleLike}
-              className={`flex items-center text-gray-500 hover:text-teal-500 transition-colors ${
-                isLiked ? "text-teal-500" : ""
-              }`}
+              onClick={() => handleCardAction("like")}
+              className="flex items-center text-gray-500 hover:text-teal-500 transition-colors"
             >
-              <Heart
-                className={`h-4 w-4 mr-1 ${isLiked ? "fill-current" : ""}`}
-              />
-              <span className="text-sm">
-                {(event.likes || 0) + (isLiked ? 1 : 0)}
-              </span>
+              <Heart className="h-4 w-4 mr-1" />
+              <span className="text-sm">{likesCount}</span>
             </button>
 
             <button
-              onClick={handleComment}
+              onClick={() => handleCardAction("comment")}
               className="flex items-center text-gray-500 hover:text-teal-500 transition-colors"
             >
               <MessageCircle className="h-4 w-4 mr-1" />
-              <span className="text-sm">{event.comments?.length || 0}</span>
+              <span className="text-sm">{commentsCount}</span>
             </button>
           </div>
 
@@ -115,30 +111,6 @@ const EventCard = ({ event, onRefresh }: EventCardProps) => {
             View Details
           </Button>
         </div>
-
-        {/* Comments section */}
-        {showComments && event.comments && event.comments.length > 0 && (
-          <div className="mt-4 pt-4 border-t">
-            <h4 className="text-sm font-semibold text-gray-900 mb-2">
-              Comments
-            </h4>
-            <div className="space-y-2">
-              {event.comments.map((comment) => (
-                <div key={comment.id} className="flex items-start space-x-2">
-                  <div className="w-8 h-8 rounded-full bg-teal-100 flex items-center justify-center text-teal-600 text-sm font-medium">
-                    {comment.avatar || comment.author[0]}
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-gray-900">
-                      {comment.author}
-                    </p>
-                    <p className="text-sm text-gray-600">{comment.text}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
       </div>
     </div>
   );
