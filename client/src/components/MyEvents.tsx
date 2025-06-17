@@ -1,10 +1,18 @@
+
 import { useState, useEffect } from 'react';
 import { Calendar, MapPin, Phone, Heart, MessageCircle, Plus, Edit, Trash2 } from 'lucide-react';
 import { Event } from '@/types/Event';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import EventForm from '@/components/EventForm';
+import { useToast } from '@/hooks/use-toast';
 
 const MyEvents = () => {
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { toast } = useToast();
 
   useEffect(() => {
     // Simulate loading events
@@ -57,6 +65,39 @@ const MyEvents = () => {
     }, 1500);
   }, []);
 
+  const handleCreateEvent = async (formData: any) => {
+    setIsSubmitting(true);
+    
+    // Simulate API call
+    await new Promise(resolve => setTimeout(resolve, 2000));
+
+    const newEvent: Event = {
+      id: Date.now().toString(),
+      title: formData.title,
+      description: formData.description,
+      location: formData.location,
+      date: new Date(formData.date),
+      image: formData.image || 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=400',
+      tags: formData.tags as 'Tech' | 'Health' | 'Others',
+      phoneNumber: formData.phoneNumber,
+      likes: 0,
+      comments: []
+    };
+
+    setEvents(prev => [newEvent, ...prev]);
+    setIsSubmitting(false);
+    setIsDialogOpen(false);
+    
+    toast({
+      title: "Success!",
+      description: "Your event has been created successfully.",
+    });
+  };
+
+  const handleCancel = () => {
+    setIsDialogOpen(false);
+  };
+
   if (loading) {
     return (
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -77,9 +118,33 @@ const MyEvents = () => {
             Events
           </span>
         </h1>
-        <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+        <p className="text-xl text-gray-600 max-w-2xl mx-auto mb-8">
           Manage and organize your events in one place
         </p>
+        
+        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+          <DialogTrigger asChild>
+            <Button className="bg-gradient-to-r from-teal-500 to-coral-500 hover:from-teal-600 hover:to-coral-600 text-white px-6 py-3 rounded-full font-semibold">
+              <Plus className="h-5 w-5 mr-2" />
+              Create Event
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle className="text-2xl font-bold text-center">
+                Create Your{' '}
+                <span className="bg-gradient-to-r from-teal-600 to-coral-600 bg-clip-text text-transparent">
+                  Event
+                </span>
+              </DialogTitle>
+            </DialogHeader>
+            <EventForm 
+              onSubmit={handleCreateEvent}
+              onCancel={handleCancel}
+              isSubmitting={isSubmitting}
+            />
+          </DialogContent>
+        </Dialog>
       </div>
 
       {/* Events List */}
@@ -160,12 +225,29 @@ const MyEvents = () => {
       {events.length === 0 && (
         <div className="text-center py-12">
           <p className="text-gray-500 text-lg">You haven't posted any events yet.</p>
-          <button className="mt-4 px-6 py-3 bg-teal-500 hover:bg-teal-600 text-white rounded-full transition-colors">
-            <div className="flex items-center space-x-2">
-              <Plus className="h-5 w-5" />
-              <span>Post Your First Event</span>
-            </div>
-          </button>
+          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+            <DialogTrigger asChild>
+              <Button className="mt-4 px-6 py-3 bg-teal-500 hover:bg-teal-600 text-white rounded-full transition-colors">
+                <Plus className="h-5 w-5 mr-2" />
+                Post Your First Event
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle className="text-2xl font-bold text-center">
+                  Create Your{' '}
+                  <span className="bg-gradient-to-r from-teal-600 to-coral-600 bg-clip-text text-transparent">
+                    Event
+                  </span>
+                </DialogTitle>
+              </DialogHeader>
+              <EventForm 
+                onSubmit={handleCreateEvent}
+                onCancel={handleCancel}
+                isSubmitting={isSubmitting}
+              />
+            </DialogContent>
+          </Dialog>
         </div>
       )}
     </div>

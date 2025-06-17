@@ -1,13 +1,24 @@
 
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Calendar, User, Menu, X } from 'lucide-react';
+import { Calendar, User, Menu, X, LogOut } from 'lucide-react';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
 
   const isActive = (path: string) => location.pathname === path;
+
+  const handleLogout = () => {
+    // Add logout logic here
+    console.log('Logout clicked');
+  };
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-sm shadow-lg border-b border-teal-100">
@@ -46,12 +57,20 @@ const Navbar = () => {
               My Events
             </Link>
             
-            {/* User Avatar */}
-            <div className="relative group">
-              <div className="w-10 h-10 bg-gradient-to-r from-teal-400 to-coral-400 rounded-full flex items-center justify-center cursor-pointer hover:scale-105 transition-transform">
-                <User className="h-5 w-5 text-white" />
-              </div>
-            </div>
+            {/* User Avatar with Dropdown */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <div className="w-10 h-10 bg-gradient-to-r from-teal-400 to-coral-400 rounded-full flex items-center justify-center cursor-pointer hover:scale-105 transition-transform">
+                  <User className="h-5 w-5 text-white" />
+                </div>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-48 bg-white">
+                <DropdownMenuItem onClick={handleLogout} className="cursor-pointer">
+                  <LogOut className="h-4 w-4 mr-2" />
+                  Logout
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
 
           {/* Mobile menu button */}
@@ -85,6 +104,16 @@ const Navbar = () => {
               >
                 My Events
               </Link>
+              <button
+                onClick={() => {
+                  handleLogout();
+                  setIsMenuOpen(false);
+                }}
+                className="px-4 py-3 rounded-lg transition-all text-gray-600 hover:bg-gray-100 text-left flex items-center"
+              >
+                <LogOut className="h-4 w-4 mr-2" />
+                Logout
+              </button>
             </div>
           </div>
         )}

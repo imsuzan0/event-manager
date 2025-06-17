@@ -11,7 +11,9 @@ export interface Event {
   title: string;
   description: string;
   location: string;
-  date: Date;
+  date: Date; // Keep for backward compatibility
+  startDate?: Date; // New optional field
+  endDate?: Date; // New optional field
   image?: string;
   tags: 'Tech' | 'Health' | 'Others';
   phoneNumber: string;
