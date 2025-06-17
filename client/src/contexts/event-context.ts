@@ -1,5 +1,5 @@
 import { createContext, useContext } from "react";
-import type { Event, EventFormData } from "@/types/event";
+import type { Event, EventFormData } from "@/types/Event";
 
 interface Like {
   _id: string;

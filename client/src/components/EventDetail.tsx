@@ -12,7 +12,7 @@ import {
   Trash2,
   X,
 } from "lucide-react";
-import type { Event } from "@/types/event";
+import type { Event } from "@/types/Event";
 import { useEvent } from "@/contexts/event-context";
 import { useAuth } from "@/hooks/use-auth";
 import { useToast } from "@/hooks/use-toast";

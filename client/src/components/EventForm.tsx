@@ -14,7 +14,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { useEvent } from "@/contexts/event-context";
 import { useToast } from "@/hooks/use-toast";
-import type { EventFormData } from "@/types/event";
+import type { EventFormData } from "@/types/Event";
 
 interface EventFormProps {
   onSuccess?: () => void;

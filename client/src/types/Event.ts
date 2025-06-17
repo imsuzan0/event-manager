@@ -15,6 +15,18 @@ export interface Event {
   tag: "Tech" | "Health" | "Others";
   phone_number: string;
   image_urls: string[];
+  created_at: string;
+  updated_at: string;
   likes?: number;
   comments?: Comment[];
+}
+
+export interface EventFormData {
+  title: string;
+  desc: string;
+  date: string;
+  location: string;
+  tag: string;
+  phoneNumber: string;
+  images?: File[];
 }

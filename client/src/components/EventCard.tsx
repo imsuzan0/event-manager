@@ -2,7 +2,7 @@ import { useEffect, useCallback, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Calendar, MapPin, Phone, Heart, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import type { Event } from "@/types/event";
+import type { Event } from "@/types/Event";
 import { useEvent } from "@/contexts/event-context";
 
 interface EventCardProps {

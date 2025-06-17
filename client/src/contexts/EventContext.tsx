@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { EventContext } from "./event-context";
-import type { Event, EventFormData } from "@/types/event";
+import type { Event, EventFormData } from "@/types/Event";
 
 export const EventProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
