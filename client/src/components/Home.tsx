@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import EventCard from './EventCard';
 import { Event } from '@/types/Event';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import EventForm from '@/components/EventForm';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/contexts/AuthContext';
 import { Plus } from 'lucide-react';
 
 const Home = () => {
@@ -14,6 +16,8 @@ const Home = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
+  const { user } = useAuth();
+  const navigate = useNavigate();
 
   useEffect(() => {
     // Simulate loading events
@@ -106,7 +110,20 @@ const Home = () => {
     setIsDialogOpen(false);
   };
 
+  const handleCreateEventClick = () => {
+    if (!user) {
+      navigate('/login');
+      return;
+    }
+    setIsDialogOpen(true);
+  };
+
   const handleLike = (eventId: string) => {
+    if (!user) {
+      navigate('/login');
+      return;
+    }
+    
     setEvents(events.map(event => 
       event.id === eventId 
         ? { ...event, likes: event.likes + 1 }
@@ -115,11 +132,16 @@ const Home = () => {
   };
 
   const handleComment = (eventId: string, comment: string) => {
+    if (!user) {
+      navigate('/login');
+      return;
+    }
+    
     const newComment = {
       id: Date.now().toString(),
-      author: 'You',
+      author: user.name || 'You',
       text: comment,
-      avatar: 'Y'
+      avatar: user.name ? user.name.charAt(0).toUpperCase() : 'Y'
     };
     
     setEvents(events.map(event => 
@@ -165,26 +187,31 @@ const Home = () => {
         
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
-            <Button className="bg-gradient-to-r from-teal-500 to-coral-500 hover:from-teal-600 hover:to-coral-600 text-white px-6 py-3 rounded-full font-semibold mb-8">
+            <Button 
+              onClick={handleCreateEventClick}
+              className="bg-gradient-to-r from-teal-500 to-coral-500 hover:from-teal-600 hover:to-coral-600 text-white px-6 py-3 rounded-full font-semibold mb-8"
+            >
               <Plus className="h-5 w-5 mr-2" />
               Create Event
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle className="text-2xl font-bold text-center">
-                Create Your{' '}
-                <span className="bg-gradient-to-r from-teal-600 to-coral-600 bg-clip-text text-transparent">
-                  Event
-                </span>
-              </DialogTitle>
-            </DialogHeader>
-            <EventForm 
-              onSubmit={handleCreateEvent}
-              onCancel={handleCancel}
-              isSubmitting={isSubmitting}
-            />
-          </DialogContent>
+          {user && (
+            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle className="text-2xl font-bold text-center">
+                  Create Your{' '}
+                  <span className="bg-gradient-to-r from-teal-600 to-coral-600 bg-clip-text text-transparent">
+                    Event
+                  </span>
+                </DialogTitle>
+              </DialogHeader>
+              <EventForm 
+                onSubmit={handleCreateEvent}
+                onCancel={handleCancel}
+                isSubmitting={isSubmitting}
+              />
+            </DialogContent>
+          )}
         </Dialog>
       </div>
 
