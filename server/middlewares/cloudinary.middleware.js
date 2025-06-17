@@ -12,7 +12,8 @@ export const uploadImage = async (req, res, next) => {
     const file = req.file; // Get the file from the request
 
     if (!file) {
-      return res.status(400).json({ message: "No file uploaded" });
+      // return res.status(400).json({ message: "No file uploaded" });
+    return next()
     }
 
     // Upload the image to Cloudinary

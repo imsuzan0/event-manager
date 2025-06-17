@@ -27,7 +27,7 @@ router.post(
   createEvent
 );
 router.patch(
-  "/update",
+  "/update:id",
   protectRoute,
   upload.single("image"),
   updateImage,
