@@ -22,6 +22,7 @@ interface EventFormProps {
   initialData?: Partial<EventFormData>;
   mode?: "create" | "edit";
   eventId?: string;
+  existingImages?: string[];
 }
 
 const EventForm = ({
@@ -30,6 +31,7 @@ const EventForm = ({
   initialData = {},
   mode = "create",
   eventId,
+  existingImages = [],
 }: EventFormProps) => {
   const [formData, setFormData] = useState<EventFormData>({
     title: initialData.title || "",
@@ -41,7 +43,9 @@ const EventForm = ({
   });
 
   const [fileImages, setFileImages] = useState<File[]>([]);
-  const [previewImages, setPreviewImages] = useState<string[]>([]);
+  const [previewImages, setPreviewImages] = useState<string[]>(existingImages);
+  const [existingImageUrls, setExistingImageUrls] =
+    useState<string[]>(existingImages);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -76,8 +80,19 @@ const EventForm = ({
   };
 
   const removeImage = (index: number) => {
-    setFileImages((prev) => prev.filter((_, i) => i !== index));
-    setPreviewImages((prev) => prev.filter((_, i) => i !== index));
+    const totalExistingImages = existingImageUrls.length;
+
+    if (index < totalExistingImages) {
+      // Removing an existing image
+      setExistingImageUrls((prev) => prev.filter((_, i) => i !== index));
+      setPreviewImages((prev) => prev.filter((_, i) => i !== index));
+    } else {
+      // Removing a newly added image
+      const newImageIndex = index - totalExistingImages;
+      setFileImages((prev) => prev.filter((_, i) => i !== newImageIndex));
+      setPreviewImages((prev) => prev.filter((_, i) => i !== index));
+    }
+
     if (currentImageIndex >= previewImages.length - 1) {
       setCurrentImageIndex(Math.max(0, previewImages.length - 2));
     }
@@ -144,9 +159,10 @@ const EventForm = ({
 
     setIsSubmitting(true);
     try {
-      const eventData: EventFormData = {
+      const eventData: EventFormData & { existingImages?: string[] } = {
         ...formData,
         images: fileImages,
+        existingImages: existingImageUrls,
       };
 
       if (mode === "create") {
@@ -177,7 +193,10 @@ const EventForm = ({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form
+      onSubmit={handleSubmit}
+      className="space-y-4 max-h-[calc(100vh-4rem)] overflow-y-auto pb-20 relative"
+    >
       <div>
         <Label htmlFor="title">Event Title *</Label>
         <Input
@@ -352,7 +371,7 @@ const EventForm = ({
         </div>
       </div>
 
-      <div className="flex justify-end space-x-4 pt-4">
+      <div className="fixed bottom-0 left-0 right-0 bg-white p-4 border-t flex justify-end space-x-4">
         <Button
           type="button"
           variant="outline"

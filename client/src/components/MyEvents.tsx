@@ -1,25 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  Calendar,
-  MapPin,
-  Phone,
-  Heart,
-  MessageCircle,
-  Plus,
-  Edit,
-  Trash2,
-  Loader2,
-} from "lucide-react";
+import { Plus, Edit, Trash2, Loader2 } from "lucide-react";
 import type { Event } from "@/types/Event";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-  DialogDescription,
-} from "@/components/ui/dialog";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -31,6 +13,12 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { useEvent } from "@/contexts/event-context";
@@ -185,14 +173,16 @@ const MyEvents = () => {
         </div>
       )}
 
+      {/* Edit Event Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="max-w-lg">
+        <DialogContent className="max-w-3xl">
           <DialogHeader>
             <DialogTitle>Edit Event</DialogTitle>
           </DialogHeader>
           {editingEvent && (
             <EventForm
               mode="edit"
+              eventId={editingEvent._id}
               initialData={{
                 title: editingEvent.title,
                 desc: editingEvent.desc,
@@ -201,7 +191,7 @@ const MyEvents = () => {
                 tag: editingEvent.tag,
                 phoneNumber: editingEvent.phone_number,
               }}
-              eventId={editingEvent._id}
+              existingImages={editingEvent.image_urls}
               onSuccess={() => {
                 setIsDialogOpen(false);
                 fetchMyEvents();

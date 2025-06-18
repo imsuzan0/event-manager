@@ -39,14 +39,19 @@ export const EventProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   };
 
-  const updateEvent = async (id: string, data: Partial<EventFormData>) => {
+  const updateEvent = async (
+    id: string,
+    data: Partial<EventFormData> & { existingImages?: string[] }
+  ) => {
     const formData = new FormData();
-    console.log({formData})
     Object.entries(data).forEach(([key, value]) => {
       if (key === "images" && Array.isArray(value)) {
         value.forEach((file) => {
           formData.append("images", file);
         });
+      } else if (key === "existingImages" && Array.isArray(value)) {
+        // Send existing images as JSON string to preserve array structure
+        formData.append("existingImages", JSON.stringify(value));
       } else if (value !== undefined) {
         formData.append(key, String(value));
       }

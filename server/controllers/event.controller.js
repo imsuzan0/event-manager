@@ -39,10 +39,8 @@ export const createEvent = async (req, res) => {
 export const updateEvent = async (req, res) => {
   const { id } = req.params;
   const userId = req.user.id;
-  const { title, desc, date, location, tag } = req.body;
-
-  const images = req.uploadedImages || [];
-  const imageUrls = images.map((img) => img.secure_url);
+  const { title, desc, date, location, tag, phoneNumber, existingImages } =
+    req.body;
 
   const event = await Event.findById(id);
   if (!event) {
@@ -56,6 +54,12 @@ export const updateEvent = async (req, res) => {
   }
 
   try {
+    // Handle images: combine existing and new images
+    const newImages = req.uploadedImages || [];
+    const newImageUrls = newImages.map((img) => img.secure_url);
+    const existingImageUrls = existingImages ? JSON.parse(existingImages) : [];
+    const finalImageUrls = [...existingImageUrls, ...newImageUrls];
+
     const update = await Event.updateOne(
       { _id: id },
       {
@@ -65,7 +69,8 @@ export const updateEvent = async (req, res) => {
           date,
           location,
           tag,
-          image_urls: imageUrls,
+          phone_number: phoneNumber,
+          image_urls: finalImageUrls,
         },
       }
     );

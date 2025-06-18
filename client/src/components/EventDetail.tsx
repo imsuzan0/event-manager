@@ -11,6 +11,8 @@ import {
   Edit,
   Trash2,
   X,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import type { Event } from "@/types/Event";
 import { useEvent } from "@/contexts/event-context";
@@ -58,6 +60,7 @@ const EventDetail = () => {
   const [editingComment, setEditingComment] = useState<string | null>(null);
   const [editText, setEditText] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const {
     getEvent,
     toggleLike,
@@ -121,19 +124,46 @@ const EventDetail = () => {
     fetchEvent();
   }, [fetchEvent]);
 
-   const handleView=()=>{
-    if(user){
-      navigate(`/events/${event._id}`)
-    }else{
-      navigate("/signup")
+  const handleView = () => {
+    if (user) {
+      navigate(`/events/${event._id}`);
+    } else {
+      navigate("/signup");
     }
-   }
+  };
 
-const handleLike = async () => {
-  handleView()
-};
+  const handleLike = async () => {
+    if (!user) {
+      toast({
+        title: "Login Required",
+        description: "Please login to like events",
+        variant: "default",
+        duration: 3000,
+      });
+      setTimeout(() => {
+        navigate("/login");
+      }, 500);
+      return;
+    }
 
+    if (!id) return;
 
+    try {
+      await toggleLike(id);
+      await fetchLikes(); // Refresh likes count and status
+      toast({
+        title: liked ? "Event unliked" : "Event liked",
+        duration: 2000,
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to update like",
+        variant: "destructive",
+        duration: 3000,
+      });
+    }
+  };
 
   const handleSubmitComment = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -246,6 +276,32 @@ const handleLike = async () => {
     return format(new Date(dateStr), "PPPP"); // "Monday, April 29th, 2023"
   };
 
+  const nextImage = () => {
+    if (!event?.image_urls) return;
+    setCurrentImageIndex((prev) => (prev + 1) % event.image_urls.length);
+  };
+
+  const prevImage = () => {
+    if (!event?.image_urls) return;
+    setCurrentImageIndex(
+      (prev) => (prev - 1 + event.image_urls.length) % event.image_urls.length
+    );
+  };
+
+  const handleImageNext = () => {
+    if (!event) return;
+    setCurrentImageIndex((prevIndex) =>
+      prevIndex === event.image_urls.length - 1 ? 0 : prevIndex + 1
+    );
+  };
+
+  const handleImagePrev = () => {
+    if (!event) return;
+    setCurrentImageIndex((prevIndex) =>
+      prevIndex === 0 ? event.image_urls.length - 1 : prevIndex - 1
+    );
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -292,14 +348,39 @@ const handleLike = async () => {
           Back to Events
         </button>
 
-        {/* Event Image */}
-        <div className="relative rounded-xl overflow-hidden mb-8 shadow-lg">
+        {/* Event Image Carousel */}
+        <div className="relative rounded-xl overflow-hidden mb-8 shadow-lg aspect-video">
           <img
-            src={event.image_urls?.[0] || "/placeholder.svg"}
-            alt={event.title}
-            className="w-full h-[400px] object-cover"
+            src={event.image_urls?.[currentImageIndex] || "/placeholder.svg"}
+            alt={`${event.title} - Image ${currentImageIndex + 1}`}
+            className="w-full h-full object-contain bg-gray-100"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
+
+          {/* Navigation arrows */}
+          {event.image_urls && event.image_urls.length > 1 && (
+            <>
+              <button
+                type="button"
+                onClick={prevImage}
+                className="absolute left-2 top-1/2 -translate-y-1/2 p-2 rounded-full bg-black/50 text-white hover:bg-black/75 transition-colors"
+              >
+                <ChevronLeft className="w-6 h-6" />
+              </button>
+              <button
+                type="button"
+                onClick={nextImage}
+                className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-full bg-black/50 text-white hover:bg-black/75 transition-colors"
+              >
+                <ChevronRight className="w-6 h-6" />
+              </button>
+
+              {/* Image counter */}
+              <div className="absolute bottom-4 right-4 px-3 py-1.5 rounded-full bg-black/50 text-white text-sm">
+                {currentImageIndex + 1} / {event.image_urls.length}
+              </div>
+            </>
+          )}
         </div>
 
         {/* Event Content */}
