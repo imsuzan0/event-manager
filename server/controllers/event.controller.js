@@ -1,11 +1,11 @@
 import { StatusCodes } from "http-status-codes";
-import {Event} from "../models/event.model.js";
+import { Event } from "../models/event.model.js";
 
 export const createEvent = async (req, res) => {
   const { title, desc, date, location, tag, phoneNumber } = req.body;
   const userId = req.user.id;
   const images = req.uploadedImages || [];
-  const imageUrls = images.map(img => img.secure_url);
+  const imageUrls = images.map((img) => img.secure_url);
 
   if (!title || !desc || !date || !location || !tag || !phoneNumber) {
     return res
@@ -41,13 +41,12 @@ export const updateEvent = async (req, res) => {
   const { title, desc, date, location, tag } = req.body;
 
   const images = req.uploadedImages || [];
-  const imageUrls = images.map(img => img.secure_url);
+  const imageUrls = images.map((img) => img.secure_url);
 
   const event = await Event.findById(id);
   if (!event) {
     return res.status(StatusCodes.NOT_FOUND).json({ msg: "Event not found" });
   }
-
 
   if (event.user_id.toString() != userId.toString()) {
     return res
@@ -94,19 +93,29 @@ export const deleteEvent = async (req, res) => {
     const { id } = req.params;
     const event = await Event.findById(id);
     const userId = req.user.id;
+
     if (!event) {
       return res.status(StatusCodes.NOT_FOUND).json({ msg: "Event not found" });
     }
 
-    if (event.user_id.toString() != userId.toString()) {
+    if (event.user_id.toString() !== userId.toString()) {
       return res
         .status(StatusCodes.UNAUTHORIZED)
         .json({ msg: "You are not authorized to delete this event" });
     }
 
+    const images = event.image_urls || [];
+
+    if (images.length > 0) {
+      await Promise.all(
+        images.map((image) => cloudinary.uploader.destroy(image))
+      );
+    }
+
     await Event.findByIdAndDelete(id);
     res.status(200).json({ msg: "Event removed successfully" });
   } catch (error) {
+    console.error("Delete Event Error:", error);
     res
       .status(StatusCodes.INTERNAL_SERVER_ERROR)
       .json({ msg: "Internal Server Error", error: error.message });

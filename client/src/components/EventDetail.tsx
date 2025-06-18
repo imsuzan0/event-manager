@@ -107,6 +107,7 @@ const EventDetail = () => {
     } catch (error) {
       toast({
         title: "Error",
+        duration: 5000,
         description: "Failed to load event details",
         variant: "destructive",
       });
@@ -120,37 +121,35 @@ const EventDetail = () => {
     fetchEvent();
   }, [fetchEvent]);
 
-  const handleLike = async () => {
-    if (!user || !id) {
-      toast({
-        title: "Login Required",
-        description: "Please login to like events",
-        variant: "default",
-      });
-      navigate("/login");
-      return;
+   const handleView=()=>{
+    if(user){
+      navigate(`/events/${event._id}`)
+    }else{
+      navigate("/signup")
     }
+   }
 
-    try {
-      await toggleLike(id);
-      await fetchLikes();
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to update like",
-        variant: "destructive",
-      });
-    }
-  };
+const handleLike = async () => {
+  handleView()
+};
+
+
 
   const handleSubmitComment = async (e: React.FormEvent) => {
     e.preventDefault();
+
     if (!user) {
       toast({
         title: "Login Required",
         description: "Please login to comment",
         variant: "default",
+        duration: 3000,
       });
+
+      setTimeout(() => {
+        navigate("/login");
+      }, 500); // Quick delay to show toast before redirect
+
       return;
     }
 
@@ -159,6 +158,7 @@ const EventDetail = () => {
         title: "Error",
         description: "Please enter a comment",
         variant: "destructive",
+        duration: 5000,
       });
       return;
     }
@@ -172,12 +172,14 @@ const EventDetail = () => {
       toast({
         title: "Success",
         description: "Comment added successfully",
+        duration: 5000,
       });
     } catch (error) {
       toast({
         title: "Error",
         description: "Failed to add comment",
         variant: "destructive",
+        duration: 5000,
       });
     } finally {
       setIsSubmitting(false);
@@ -190,6 +192,7 @@ const EventDetail = () => {
         title: "Error",
         description: "Please enter a comment",
         variant: "destructive",
+        duration: 5000,
       });
       return;
     }
@@ -203,12 +206,14 @@ const EventDetail = () => {
       toast({
         title: "Success",
         description: "Comment updated successfully",
+        duration: 5000,
       });
     } catch (error) {
       toast({
         title: "Error",
         description: "Failed to update comment",
         variant: "destructive",
+        duration: 5000,
       });
     } finally {
       setIsSubmitting(false);
@@ -223,12 +228,14 @@ const EventDetail = () => {
       toast({
         title: "Success",
         description: "Comment deleted successfully",
+        duration: 5000,
       });
     } catch (error) {
       toast({
         title: "Error",
         description: "Failed to delete comment",
         variant: "destructive",
+        duration: 5000,
       });
     } finally {
       setIsSubmitting(false);

@@ -23,7 +23,7 @@ import { protectRoute } from "../middlewares/protectRoute.middleware.js";
 import { getEventLikes, likeUnlikeToggle } from "../controllers/like.controller.js";
 const router = express.Router();
 
-router.get("/", protectRoute, getallEvents);
+router.get("/", getallEvents);
 router.get("/myevents", protectRoute, getMyEvents);
 router.get("/:id", protectRoute, getSingleEvent);
 router.post(
@@ -40,7 +40,7 @@ router.patch(
   updateImages,
   updateEvent
 );
-router.delete("/delete/:id", protectRoute, deleteImages, deleteEvent);
+router.delete("/delete/:id", protectRoute,  deleteEvent);
 
 // like
 router.post("/like/:eventId", protectRoute, likeUnlikeToggle);

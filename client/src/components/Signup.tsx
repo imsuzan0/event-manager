@@ -82,7 +82,7 @@ const Signup = () => {
     try {
       await signup(formData.email, formData.password, formData.fullName);
       toast({
-        title: "Welcome to EventHub!",
+        title: "Welcome to EventGhar!",
         description: "Your account has been created successfully.",
       });
       navigate("/");
@@ -116,13 +116,13 @@ const Signup = () => {
               <Calendar className="h-6 w-6 text-white" />
             </div>
             <span className="text-xl font-bold bg-gradient-to-r from-teal-600 to-coral-600 bg-clip-text text-transparent">
-              EventHub
+              EventGhar
             </span>
           </div>
           <h1 className="text-2xl font-bold text-gray-900 mb-2">
             Create Account
           </h1>
-          <p className="text-gray-600">Join the EventHub community</p>
+          <p className="text-gray-600">Join the EventGhar community</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">

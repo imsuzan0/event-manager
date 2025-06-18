@@ -39,37 +39,37 @@ export const EventProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   };
 
-  const updateEvent = async (id: string, data: Partial<EventFormData>) => {
-    const formData = new FormData();
-    Object.entries(data).forEach(([key, value]) => {
-      if (key === "images" && Array.isArray(value)) {
-        value.forEach((file) => {
-          formData.append("images", file);
-        });
-      } else if (value !== undefined) {
-        formData.append(key, String(value));
-      }
+ const updateEvent = async (id: string, data: Partial<EventFormData>) => {
+  const formData = new FormData();
+  Object.entries(data).forEach(([key, value]) => {
+    if (key === "images" && Array.isArray(value)) {
+      value.forEach((file) => {
+        formData.append("images", file);
+      });
+    } else if (value !== undefined) {
+      formData.append(key, String(value));
+    }
+  });
+
+  try {
+    const response = await fetch(`${serverUrl}/event/update/${id}`, {
+      method: "PUT",
+      body: formData,
+      credentials: "include",
     });
 
-    try {
-      const response = await fetch(`${serverUrl}/event/update/${id}`, {
-        method: "PUT",
-        body: formData,
-        credentials: "include",
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.msg || "Failed to update event");
-      }
-
-      const { event } = await response.json();
-      return event;
-    } catch (error) {
-      console.error("Error updating event:", error);
-      throw error;
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.msg || "Failed to update event");
     }
-  };
+
+    const { event } = await response.json();
+    return event;
+  } catch (error) {
+    console.error("Error updating event:", error);
+    throw error;
+  }
+};
 
   const deleteEvent = async (id: string) => {
     try {
@@ -299,3 +299,4 @@ export const EventProvider: React.FC<{ children: React.ReactNode }> = ({
     </EventContext.Provider>
   );
 };
+

@@ -105,21 +105,40 @@ export const updateImages = async (req, res, next) => {
 //delete image
 export const deleteImages = async (req, res, next) => {
   try {
-    const publicIds = JSON.parse(req.body.public_ids || "[]");
+    // If not provided, skip deletion
+    if (!req.body.public_ids) {
+      return next();
+    }
 
+    let publicIds;
+
+    try {
+      publicIds = JSON.parse(req.body.public_ids);
+    } catch (parseError) {
+      console.warn("Invalid JSON for public_ids:", req.body.public_ids);
+      return next(); // skip if not valid JSON
+    }
+
+    // If it's not an array or it's empty, skip
     if (!Array.isArray(publicIds) || publicIds.length === 0) {
       return next();
     }
 
+    console.log("Deleting images with IDs:", publicIds);
+
     const deletePromises = publicIds.map(id =>
-      cloudinary.uploader.destroy(id)
+      cloudinary.uploader.destroy(id).catch(err => {
+        console.error(`Failed to delete image ${id}:`, err);
+        return null;
+      })
     );
 
-    await Promise.all(deletePromises);
+    const results = await Promise.all(deletePromises);
+    console.log("Cloudinary delete results:", results);
 
     next();
   } catch (error) {
-    console.error("Delete Images Error:", error);
-    res.status(500).json({ message: "Failed to delete images", error });
+    console.error("Delete Images Middleware Error:", error);
+    res.status(500).json({ message: "Failed to delete images", error: error.message });
   }
 };

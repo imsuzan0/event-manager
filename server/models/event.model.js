@@ -25,11 +25,11 @@ const eventSchema = new mongoose.Schema(
     },
     tag: {
       type: String,
-      enum: ["Tech", "Health", "Others"],
+      enum: ["Tech", "Health", "Music","Sports","Food","Art","Business","Education","Others"],
       default: "Others",
     },
     image_urls: {
-    type: [{ secure_url: String, public_id: String }],
+    type: [String],
     required: false,
     },
     phone_number: {

@@ -4,6 +4,7 @@ import { Calendar, MapPin, Phone, Heart, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { Event } from "@/types/Event";
 import { useEvent } from "@/contexts/event-context";
+import { useAuth } from "@/hooks/use-auth";
 
 interface EventCardProps {
   event: Event;
@@ -15,6 +16,16 @@ const EventCard = ({ event, onRefresh }: EventCardProps) => {
   const { getEventLikes, getEventComments } = useEvent();
   const [likesCount, setLikesCount] = useState(0);
   const [commentsCount, setCommentsCount] = useState(0);
+
+  const { user } = useAuth();
+
+  const handleView = () => {
+    if (user) {
+      navigate(`/events/${event._id}`);
+    } else {
+      navigate("/signup");
+    }
+  };
 
   const fetchCounts = useCallback(async () => {
     try {
@@ -37,6 +48,11 @@ const EventCard = ({ event, onRefresh }: EventCardProps) => {
   }, [fetchCounts]);
 
   const handleCardAction = (action: "like" | "comment") => {
+    if (!user) {
+      navigate("/signup");
+      return;
+    }
+
     navigate(
       `/events/${event._id}${action === "comment" ? "#comments-section" : ""}`
     );
@@ -101,11 +117,7 @@ const EventCard = ({ event, onRefresh }: EventCardProps) => {
             </button>
           </div>
 
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => navigate(`/events/${event._id}`)}
-          >
+          <Button variant="outline" size="sm" onClick={handleView}>
             View Details
           </Button>
         </div>

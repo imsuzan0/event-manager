@@ -41,6 +41,8 @@ const MyEvents = () => {
   const [loading, setLoading] = useState(true);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [deletingEventId, setDeletingEventId] = useState<string | null>(null);
+  const [editingEvent, setEditingEvent] = useState<Event | null>(null);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const { toast } = useToast();
   const { getMyEvents, deleteEvent } = useEvent();
   const navigate = useNavigate();
@@ -66,7 +68,11 @@ const MyEvents = () => {
   }, [fetchMyEvents]);
 
   const handleEditEvent = (eventId: string) => {
-    navigate(`/events/edit/${eventId}`);
+    const selectedEvent = events.find((event) => event._id === eventId);
+    if (selectedEvent) {
+      setEditingEvent(selectedEvent);
+      setIsEditDialogOpen(true);
+    }
   };
 
   const handleDeleteEvent = async (eventId: string) => {
@@ -158,7 +164,7 @@ const MyEvents = () => {
                       <Button
                         size="icon"
                         variant="destructive"
-                        className="bg-white/90 hover:bg-red-500 hover:text-white"
+                        className="bg-white text-red-600 hover:bg-red-500 hover:text-white"
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>

@@ -119,8 +119,36 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   };
 
+  const getProfile = async () => {
+  try {
+    const response = await fetch(`${serverUrl}/auth/getMe`, {
+      method: "GET",
+      credentials: "include",
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch profile");
+    }
+
+    const { user: profileUser } = await response.json();
+
+    const userData: User = {
+      id: profileUser.id,
+      name: profileUser.name,
+      email: profileUser.email,
+      profilePic: profileUser.profilePic, 
+    };
+
+    setUser(userData);
+    localStorage.setItem("user", JSON.stringify(userData));
+  } catch (error) {
+    console.error("Profile fetch error:", error);
+  }
+};
+
+
   return (
-    <AuthContext.Provider value={{ user, login, signup, logout, isLoading }}>
+    <AuthContext.Provider value={{ user, login, signup, logout, isLoading, getProfile }}>
       {children}
     </AuthContext.Provider>
   );

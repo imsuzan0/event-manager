@@ -8,11 +8,11 @@ const Footer = () => {
         <div className="flex flex-col md:flex-row justify-between items-center">
           <div className="mb-6 md:mb-0">
             <h3 className="text-2xl font-bold bg-gradient-to-r from-teal-400 to-coral-400 bg-clip-text text-transparent">
-              EventHub
+              EventGhar
             </h3>
             <p className="text-gray-400 mt-2">Connecting communities through events</p>
             <p className="text-gray-400 text-sm mt-1">
-              Contact: <a href="mailto:hello@eventhub.com" className="text-teal-400 hover:text-teal-300">hello@eventhub.com</a>
+              Contact: <a href="mailto:hello@eventghar.com" className="text-teal-400 hover:text-teal-300">hello@eventghar.com</a>
             </p>
           </div>
           
@@ -45,7 +45,7 @@ const Footer = () => {
         </div>
         
         <div className="border-t border-gray-800 mt-8 pt-6 text-center text-gray-400 text-sm">
-          <p>&copy; 2024 EventHub. All rights reserved.</p>
+          <p>&copy; 2025 EventGhar. All rights reserved.</p>
         </div>
       </div>
     </footer>

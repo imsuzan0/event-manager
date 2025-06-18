@@ -79,3 +79,29 @@ export const logout = async (req, res) => {
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ msg: error.message });
   }
 };
+
+
+export const getMe = async (req, res) => {
+  try {
+    // req.user should already be set by your authentication middleware
+    const userId = req.user.userId;
+
+    const user = await User.findById(userId).select("fullName email profilePic");
+
+    if (!user) {
+      return res.status(StatusCodes.NOT_FOUND).json({ msg: "User not found" });
+    }
+
+    res.status(StatusCodes.OK).json({
+      user: {
+        id: user._id,
+        name: user.fullName,
+        email: user.email,
+        profilePic: user.profilePic,
+      },
+    });
+  } catch (error) {
+    console.log("Error in getMe controller: ", error);
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ msg: error.message });
+  }
+};

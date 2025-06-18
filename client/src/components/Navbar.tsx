@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Calendar, User, Menu, X, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -10,6 +10,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { error } from "console";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -31,6 +32,7 @@ const Navbar = () => {
       console.error("Logout failed:", error);
       toast({
         title: "Logout failed",
+        duration: 5000,
         description:
           error instanceof Error
             ? error.message
@@ -50,7 +52,7 @@ const Navbar = () => {
               <Calendar className="h-6 w-6 text-white" />
             </div>
             <span className="text-xl font-bold bg-gradient-to-r from-teal-600 to-coral-600 bg-clip-text text-transparent">
-              EventHub
+              EventGhar
             </span>
           </Link>
 
@@ -80,15 +82,23 @@ const Navbar = () => {
               </Link>
             )}
 
+
             {user ? (
               // User Avatar with Dropdown
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <div className="w-10 h-10 bg-gradient-to-r from-teal-400 to-coral-400 rounded-full flex items-center justify-center cursor-pointer hover:scale-105 transition-transform">
-                    <User className="h-5 w-5 text-white" />
+                  <div className="w-10 h-10 rounded-full overflow-hidden cursor-pointer hover:scale-105 transition-transform">
+                    <img
+                      src={user.profilePic || "https://upload.wikimedia.org/wikipedia/commons/thumb/5/59/User-avatar.svg/2048px-User-avatar.svg.png"}
+                      // alt={user.name}
+                      className="w-full h-full object-cover"
+                    />
                   </div>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-48 bg-white">
+                  <div className="px-4 py-2 text-gray-700 font-semibold">
+                    {user.name}
+                  </div>
                   <DropdownMenuItem
                     onClick={handleLogout}
                     className="cursor-pointer"
@@ -99,7 +109,7 @@ const Navbar = () => {
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
-              // Login/Signup buttons
+              // Login/Signup buttons (unchanged)
               <div className="flex items-center space-x-4">
                 <Link to="/login">
                   <Button

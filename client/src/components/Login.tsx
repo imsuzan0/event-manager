@@ -33,6 +33,7 @@ const Login = () => {
         title: "Validation Error",
         description: "Please fill in all the required fields",
         variant: "destructive",
+        duration: 5000,
       });
       return;
     }
@@ -44,6 +45,7 @@ const Login = () => {
         title: "Validation Error",
         description: "Please enter a valid email address",
         variant: "destructive",
+        duration: 5000,
       });
       return;
     }
@@ -54,6 +56,7 @@ const Login = () => {
       toast({
         title: "Welcome back!",
         description: "You have successfully logged in.",
+        duration: 5000,
       });
       navigate(from, { replace: true });
     } catch (error) {
@@ -66,6 +69,7 @@ const Login = () => {
         title: "Login failed",
         description: errorMessage,
         variant: "destructive",
+        duration: 5000,
       });
     } finally {
       setIsSubmitting(false);
@@ -88,7 +92,7 @@ const Login = () => {
               <Calendar className="h-6 w-6 text-white" />
             </div>
             <span className="text-xl font-bold bg-gradient-to-r from-teal-600 to-coral-600 bg-clip-text text-transparent">
-              EventHub
+              EventGhar
             </span>
           </div>
           <h1 className="text-2xl font-bold text-gray-900 mb-2">
