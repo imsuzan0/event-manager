@@ -5,7 +5,7 @@ import type { Event, EventFormData } from "@/types/Event";
 export const EventProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const serverUrl = "http://localhost:3000/api";
+  const serverUrl = "https://api.eventghar.xyz/api";
 
   const createEvent = async (data: EventFormData) => {
     const formData = new FormData();

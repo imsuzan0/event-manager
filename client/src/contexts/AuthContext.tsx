@@ -9,7 +9,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const serverUrl = "http://localhost:3000/api"
+  const serverUrl = "https://api.eventghar.xyz/api"
 
   useEffect(() => {
     // Check if user is stored in localStorage
