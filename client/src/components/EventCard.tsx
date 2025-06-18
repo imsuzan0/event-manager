@@ -99,72 +99,77 @@ const EventCard = memo(({ event, onRefresh }: EventCardProps) => {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+    <div className="bg-gradient-to-b from-white to-indigo-50/50 rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300">
       <div className="relative">
         <img
           src={event.image_urls?.[0] || "/placeholder.svg"}
           alt={event.title}
-          className="w-full h-48 object-cover"
+          className="w-full h-52 object-cover"
         />
-        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black to-transparent p-4">
-          <h3 className="text-xl font-semibold text-white">{event.title}</h3>
-          <div className="flex items-center text-white/80 mt-1">
-            <span className="text-sm px-2 py-1 bg-teal-500/80 rounded-full">
-              {event.tag}
-            </span>
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent">
+          <div className="absolute bottom-0 left-0 right-0 p-6">
+            <div className="space-y-2">
+              <span className="inline-block px-3 py-1 bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-sm rounded-full shadow-md">
+                {event.tag}
+              </span>
+              <h3 className="text-2xl font-bold text-white">{event.title}</h3>
+            </div>
           </div>
         </div>
       </div>
 
-      <div className="p-4">
-        <p className="text-gray-600 text-sm mb-4 line-clamp-2">{event.desc}</p>
+      <div className="p-6">
+        <p className="text-gray-600 text-sm mb-4 line-clamp-2 h-10">
+          {event.desc}
+        </p>
 
-        <div className="space-y-2">
+        <div className="space-y-3">
           <div className="flex items-center text-gray-600">
-            <Calendar className="h-4 w-4 mr-2" />
+            <Calendar className="h-4 w-4 mr-3 text-indigo-600" />
             <span className="text-sm">
               {new Date(event.date).toLocaleDateString()}
             </span>
           </div>
 
           <div className="flex items-center text-gray-600">
-            <MapPin className="h-4 w-4 mr-2" />
+            <MapPin className="h-4 w-4 mr-3 text-indigo-600" />
             <span className="text-sm">{event.location}</span>
           </div>
 
           <div className="flex items-center text-gray-600">
-            <Phone className="h-4 w-4 mr-2" />
+            <Phone className="h-4 w-4 mr-3 text-indigo-600" />
             <span className="text-sm">{event.phone_number}</span>
           </div>
         </div>
 
-        <div className="flex justify-between items-center mt-4 pt-4 border-t">
+        <div className="flex justify-between items-center mt-6 pt-4 border-t border-indigo-100">
           <div className="flex space-x-4">
             <button
               onClick={handleLike}
-              className={`flex items-center transition-colors ${
-                hasLiked
-                  ? "text-red-500 hover:text-red-600"
-                  : "text-gray-500 hover:text-red-500"
+              className={`flex items-center space-x-1 ${
+                hasLiked ? "text-pink-500" : "text-gray-500 hover:text-pink-500"
               }`}
               disabled={isLiking}
             >
-              <Heart
-                className={`h-4 w-4 mr-1 ${hasLiked ? "fill-current" : ""}`}
-              />
-              <span className="text-sm">{likesCount}</span>
+              <Heart className={`h-5 w-5 ${hasLiked ? "fill-current" : ""}`} />
+              <span className="text-sm font-medium">{likesCount}</span>
             </button>
 
             <button
               onClick={handleComment}
-              className="flex items-center text-gray-500 hover:text-teal-500 transition-colors"
+              className="flex items-center space-x-1 text-gray-500 hover:text-indigo-600"
             >
-              <MessageCircle className="h-4 w-4 mr-1" />
-              <span className="text-sm">{commentsCount}</span>
+              <MessageCircle className="h-5 w-5" />
+              <span className="text-sm font-medium">{commentsCount}</span>
             </button>
           </div>
 
-          <Button variant="outline" size="sm" onClick={handleView}>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleView}
+            className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white hover:from-indigo-700 hover:to-purple-700"
+          >
             View Details
           </Button>
         </div>

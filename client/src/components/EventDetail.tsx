@@ -304,7 +304,7 @@ const EventDetail = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-teal-50">
         <div className="text-center">
           <Loader2 className="h-8 w-8 animate-spin text-teal-500 mx-auto mb-4" />
           <p className="text-gray-600">Loading event details...</p>
@@ -315,8 +315,8 @@ const EventDetail = () => {
 
   if (!event) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-teal-50">
+        <div className="text-center bg-white/80 rounded-xl shadow-lg p-8">
           <h2 className="text-2xl font-bold text-gray-900 mb-2">
             Event not found
           </h2>
@@ -337,23 +337,23 @@ const EventDetail = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-teal-50 py-10">
       <div className="container mx-auto px-4 max-w-4xl">
         {/* Back button */}
         <button
           onClick={() => navigate(-1)}
-          className="inline-flex items-center text-gray-600 hover:text-gray-900 mb-6"
+          className="inline-flex items-center text-teal-700 hover:text-teal-900 mb-6 font-medium transition-colors"
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
           Back to Events
         </button>
 
         {/* Event Image Carousel */}
-        <div className="relative rounded-xl overflow-hidden mb-8 shadow-lg aspect-video">
+        <div className="relative rounded-2xl overflow-hidden mb-8 shadow-xl aspect-video border border-slate-200 bg-white">
           <img
             src={event.image_urls?.[currentImageIndex] || "/placeholder.svg"}
             alt={`${event.title} - Image ${currentImageIndex + 1}`}
-            className="w-full h-full object-contain bg-gray-100"
+            className="w-full h-full object-cover bg-slate-100"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
 
@@ -363,20 +363,18 @@ const EventDetail = () => {
               <button
                 type="button"
                 onClick={prevImage}
-                className="absolute left-2 top-1/2 -translate-y-1/2 p-2 rounded-full bg-black/50 text-white hover:bg-black/75 transition-colors"
+                className="absolute left-2 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white/80 text-teal-700 hover:bg-white/100 shadow transition-colors"
               >
                 <ChevronLeft className="w-6 h-6" />
               </button>
               <button
                 type="button"
                 onClick={nextImage}
-                className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-full bg-black/50 text-white hover:bg-black/75 transition-colors"
+                className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white/80 text-teal-700 hover:bg-white/100 shadow transition-colors"
               >
                 <ChevronRight className="w-6 h-6" />
               </button>
-
-              {/* Image counter */}
-              <div className="absolute bottom-4 right-4 px-3 py-1.5 rounded-full bg-black/50 text-white text-sm">
+              <div className="absolute bottom-4 right-4 px-3 py-1.5 rounded-full bg-black/60 text-white text-xs font-medium">
                 {currentImageIndex + 1} / {event.image_urls.length}
               </div>
             </>
@@ -384,13 +382,13 @@ const EventDetail = () => {
         </div>
 
         {/* Event Content */}
-        <div className="bg-white rounded-xl shadow-md p-6 mb-8">
-          <div className="flex justify-between items-start mb-4">
+        <div className="bg-white rounded-2xl shadow-xl p-8 mb-10 border border-slate-200">
+          <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-6 gap-4">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">
+              <h1 className="text-3xl md:text-4xl font-extrabold text-slate-900 mb-2 tracking-tight">
                 {event.title}
               </h1>
-              <span className="inline-block px-3 py-1 rounded-full text-sm font-medium bg-teal-100 text-teal-800">
+              <span className="inline-block px-3 py-1 rounded-full text-sm font-semibold bg-teal-100 text-teal-800">
                 {event.tag}
               </span>
             </div>
@@ -400,9 +398,10 @@ const EventDetail = () => {
                 className={`flex items-center space-x-1 text-gray-500 hover:text-teal-500 transition-colors ${
                   liked ? "text-teal-500" : ""
                 }`}
+                aria-label="Like event"
               >
                 <Heart className={`h-6 w-6 ${liked ? "fill-current" : ""}`} />
-                <span>{likesCount}</span>
+                <span className="font-semibold">{likesCount}</span>
               </button>
               <button
                 onClick={() =>
@@ -411,56 +410,60 @@ const EventDetail = () => {
                     ?.scrollIntoView({ behavior: "smooth" })
                 }
                 className="flex items-center space-x-1 text-gray-500 hover:text-teal-500 transition-colors"
+                aria-label="View comments"
               >
                 <MessageCircle className="h-6 w-6" />
-                <span>{comments.length}</span>
+                <span className="font-semibold">{comments.length}</span>
               </button>
             </div>
           </div>
 
-          <div className="space-y-4 text-gray-600 mb-6">
+          <div className="space-y-4 text-slate-700 mb-6">
             <div className="flex items-center">
               <Calendar className="h-5 w-5 mr-2 text-teal-500" />
-              <span>{formatEventDate(event.date)}</span>
+              <span className="font-medium">{formatEventDate(event.date)}</span>
             </div>
             <div className="flex items-center">
               <MapPin className="h-5 w-5 mr-2 text-teal-500" />
-              <span>{event.location}</span>
+              <span className="font-medium">{event.location}</span>
             </div>
             <div className="flex items-center">
               <Phone className="h-5 w-5 mr-2 text-teal-500" />
-              <span>{event.phone_number}</span>
+              <span className="font-medium">{event.phone_number}</span>
             </div>
           </div>
 
-          <div className="prose max-w-none">
-            <p className="text-gray-600 whitespace-pre-line">{event.desc}</p>
+          <div className="prose max-w-none text-slate-800">
+            <p className="whitespace-pre-line leading-relaxed text-lg">
+              {event.desc}
+            </p>
           </div>
         </div>
 
         {/* Comments Section */}
         <div
           id="comments-section"
-          className="bg-white rounded-xl shadow-md p-6"
+          className="bg-white rounded-2xl shadow-lg p-8 border border-slate-200"
         >
-          <h2 className="text-xl font-semibold text-gray-900 mb-6">
+          <h2 className="text-2xl font-bold text-slate-900 mb-6 flex items-center gap-2">
+            <MessageCircle className="h-6 w-6 text-teal-500" />
             Comments {comments.length ? `(${comments.length})` : ""}
           </h2>
 
           {/* Comment Form */}
-          <form onSubmit={handleSubmitComment} className="mb-6">
-            <div className="flex space-x-4">
+          <form onSubmit={handleSubmitComment} className="mb-8">
+            <div className="flex flex-col md:flex-row gap-4">
               <Textarea
                 value={commentText}
                 onChange={(e) => setCommentText(e.target.value)}
                 placeholder="Write a comment..."
-                className="flex-1"
+                className="flex-1 min-h-[48px] resize-none border-slate-200 focus:border-teal-400"
                 disabled={isSubmitting || !user}
               />
               <Button
                 type="submit"
                 disabled={isSubmitting || !user}
-                className="self-end"
+                className="self-end bg-teal-600 hover:bg-teal-700 text-white font-semibold px-6 py-2 rounded-lg shadow"
               >
                 {isSubmitting ? (
                   <>
@@ -481,7 +484,7 @@ const EventDetail = () => {
                 <button
                   type="button"
                   onClick={() => navigate("/login")}
-                  className="text-teal-600 hover:text-teal-500 font-medium"
+                  className="text-teal-600 hover:text-teal-500 font-medium underline"
                 >
                   login
                 </button>{" "}
@@ -494,15 +497,15 @@ const EventDetail = () => {
           <div className="space-y-6">
             {comments.length > 0 ? (
               comments.map((comment) => (
-                <div key={comment._id} className="flex space-x-3">
+                <div key={comment._id} className="flex space-x-3 items-start">
                   <div className="flex-shrink-0">
-                    <div className="w-10 h-10 rounded-full bg-teal-100 flex items-center justify-center text-teal-600 font-medium">
+                    <div className="w-10 h-10 rounded-full bg-teal-100 flex items-center justify-center text-teal-600 font-bold text-lg shadow">
                       {comment.user_id.fullName[0]}
                     </div>
                   </div>
-                  <div className="flex-grow">
+                  <div className="flex-grow bg-slate-50 rounded-xl px-4 py-3 shadow-sm border border-slate-100">
                     <div className="flex items-center justify-between">
-                      <div className="text-sm font-medium text-gray-900">
+                      <div className="text-sm font-semibold text-slate-900">
                         {comment.user_id.fullName}
                       </div>
                       {user && comment.user_id._id === user.id && (
@@ -559,7 +562,7 @@ const EventDetail = () => {
                         <Textarea
                           value={editText}
                           onChange={(e) => setEditText(e.target.value)}
-                          className="mb-2"
+                          className="mb-2 border-slate-200 focus:border-teal-400"
                         />
                         <div className="flex justify-end space-x-2">
                           <Button
@@ -576,6 +579,7 @@ const EventDetail = () => {
                             size="sm"
                             onClick={() => handleUpdateComment(comment._id)}
                             disabled={isSubmitting}
+                            className="bg-teal-600 hover:bg-teal-700 text-white"
                           >
                             {isSubmitting ? (
                               <Loader2 className="h-4 w-4 animate-spin" />
@@ -586,7 +590,9 @@ const EventDetail = () => {
                         </div>
                       </div>
                     ) : (
-                      <div className="mt-1 text-gray-700">{comment.text}</div>
+                      <div className="mt-1 text-slate-800 text-base leading-relaxed">
+                        {comment.text}
+                      </div>
                     )}
                   </div>
                 </div>

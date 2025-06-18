@@ -15,6 +15,9 @@ import MyEvents from "@/components/MyEvents";
 import EventDetail from "@/components/EventDetail";
 import PostEvent from "@/components/PostEvent";
 import ProtectedRoute from "@/components/ProtectedRoute";
+import { FAQ } from "@/components/FAQ";
+import { PrivacyPolicy } from "@/components/PrivacyPolicy";
+import { Terms } from "@/components/Terms";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -41,6 +44,9 @@ const App = () => (
                   <Route path="/" element={<Home />} />
                   <Route path="/login" element={<Login />} />
                   <Route path="/signup" element={<Signup />} />
+                  <Route path="/faq" element={<FAQ />} />
+                  <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+                  <Route path="/terms" element={<Terms />} />
                   <Route
                     path="/my-events"
                     element={
