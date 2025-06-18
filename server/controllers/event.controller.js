@@ -1,5 +1,6 @@
 import { StatusCodes } from "http-status-codes";
 import { Event } from "../models/event.model.js";
+import cloudinary from "../utils/cloudinary.connection.js";
 
 export const createEvent = async (req, res) => {
   const { title, desc, date, location, tag, phoneNumber } = req.body;
@@ -76,9 +77,10 @@ export const updateEvent = async (req, res) => {
         .json({ msg: "No changes made to the event" });
     }
 
+    const updatedEvent = await Event.findById(id);
     return res.status(StatusCodes.OK).json({
       msg: "Event updated successfully",
-      update,
+      event: updatedEvent,
     });
   } catch (error) {
     console.error("Error updating the event:", error);

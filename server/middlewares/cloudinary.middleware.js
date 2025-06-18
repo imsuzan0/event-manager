@@ -115,7 +115,7 @@ export const deleteImages = async (req, res, next) => {
     try {
       publicIds = JSON.parse(req.body.public_ids);
     } catch (parseError) {
-      console.warn("Invalid JSON for public_ids:", req.body.public_ids);
+      console.warn("Invalid JSON for public_ids:", parseError);
       return next(); // skip if not valid JSON
     }
 
