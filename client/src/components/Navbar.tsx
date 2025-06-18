@@ -10,7 +10,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { error } from "console";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -43,27 +42,27 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-sm shadow-lg border-b border-teal-100">
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-sm border-b border-indigo-100 shadow-xl">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
+        <div className="flex justify-between items-center h-20">
           {/* Logo */}
-          <Link to="/" className="flex items-center space-x-2 group">
-            <div className="p-2 bg-gradient-to-r from-teal-500 to-coral-500 rounded-lg group-hover:scale-105 transition-transform">
-              <Calendar className="h-6 w-6 text-white" />
+          <Link to="/" className="flex items-center space-x-3 group">
+            <div className="p-3 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl group-hover:scale-110 group-hover:shadow-lg transition-all duration-300">
+              <Calendar className="h-7 w-7 text-white" />
             </div>
-            <span className="text-xl font-bold bg-gradient-to-r from-teal-600 to-coral-600 bg-clip-text text-transparent">
+            <span className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-800">
               EventGhar
             </span>
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-8">
+          <div className="hidden md:flex items-center space-x-6">
             <Link
               to="/"
-              className={`px-4 py-2 rounded-full transition-all duration-300 ${
+              className={`px-6 py-2.5 rounded-xl font-medium transition-all duration-300 ${
                 isActive("/")
-                  ? "bg-teal-100 text-teal-700 font-semibold"
-                  : "text-gray-600 hover:text-teal-600 hover:bg-teal-50"
+                  ? "bg-indigo-600 text-white shadow-md"
+                  : "text-gray-600 hover:bg-indigo-50 hover:text-indigo-600"
               }`}
             >
               Home
@@ -72,36 +71,31 @@ const Navbar = () => {
             {user && (
               <Link
                 to="/my-events"
-                className={`px-4 py-2 rounded-full transition-all duration-300 ${
+                className={`px-6 py-2.5 rounded-xl font-medium transition-all duration-300 ${
                   isActive("/my-events")
-                    ? "bg-purple-100 text-purple-700 font-semibold"
-                    : "text-gray-600 hover:text-purple-600 hover:bg-purple-50"
+                    ? "bg-indigo-600 text-white shadow-md"
+                    : "text-gray-600 hover:bg-indigo-50 hover:text-indigo-600"
                 }`}
               >
                 My Events
               </Link>
             )}
 
-
             {user ? (
-              // User Avatar with Dropdown
+              // User Icon with Dropdown
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <div className="w-10 h-10 rounded-full overflow-hidden cursor-pointer hover:scale-105 transition-transform">
-                    <img
-                      src={user.profilePic || "https://upload.wikimedia.org/wikipedia/commons/thumb/5/59/User-avatar.svg/2048px-User-avatar.svg.png"}
-                      // alt={user.name}
-                      className="w-full h-full object-cover"
-                    />
+                  <div className="p-2 rounded-full bg-indigo-50 cursor-pointer hover:bg-indigo-100 hover:scale-105 transition-all duration-300">
+                    <User className="h-6 w-6 text-indigo-600" />
                   </div>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-48 bg-white">
-                  <div className="px-4 py-2 text-gray-700 font-semibold">
+                <DropdownMenuContent align="end" className="w-48 bg-white/95 backdrop-blur-sm border border-indigo-100 shadow-lg">
+                  <div className="px-4 py-3 text-gray-800 font-semibold border-b border-indigo-50">
                     {user.name}
                   </div>
                   <DropdownMenuItem
                     onClick={handleLogout}
-                    className="cursor-pointer"
+                    className="cursor-pointer px-4 py-3 text-gray-600 hover:bg-indigo-50 hover:text-indigo-600 transition-colors"
                   >
                     <LogOut className="h-4 w-4 mr-2" />
                     Logout
@@ -109,18 +103,18 @@ const Navbar = () => {
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
-              // Login/Signup buttons (unchanged)
+              // Login/Signup buttons
               <div className="flex items-center space-x-4">
                 <Link to="/login">
                   <Button
                     variant="ghost"
-                    className="text-gray-600 hover:text-teal-600"
+                    className="text-gray-600 hover:text-indigo-600 hover:bg-indigo-50 px-6 py-2.5 rounded-xl transition-all duration-300"
                   >
                     Login
                   </Button>
                 </Link>
                 <Link to="/signup">
-                  <Button className="bg-gradient-to-r from-teal-500 to-coral-500 hover:from-teal-600 hover:to-coral-600 text-white">
+                  <Button className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-6 py-2.5 rounded-xl hover:from-indigo-700 hover:to-purple-700 transition-all duration-300 shadow-md hover:shadow-lg">
                     Sign Up
                   </Button>
                 </Link>
@@ -131,27 +125,27 @@ const Navbar = () => {
           {/* Mobile menu button */}
           <button
             onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="md:hidden p-2 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors"
+            className="md:hidden p-3 rounded-xl text-gray-600 hover:bg-indigo-50 hover:text-indigo-600 transition-all duration-300"
           >
             {isMenuOpen ? (
-              <X className="h-6 w-6" />
+              <X className="h-7 w-7" />
             ) : (
-              <Menu className="h-6 w-6" />
+              <Menu className="h-7 w-7" />
             )}
           </button>
         </div>
 
         {/* Mobile Navigation */}
         {isMenuOpen && (
-          <div className="md:hidden py-4 border-t border-gray-200">
-            <div className="flex flex-col space-y-2">
+          <div className="md:hidden py-6 border-t border-indigo-100 bg-white/95 backdrop-blur-sm">
+            <div className="flex flex-col space-y-3">
               <Link
                 to="/"
                 onClick={() => setIsMenuOpen(false)}
-                className={`px-4 py-3 rounded-lg transition-all ${
+                className={`px-6 py-3 rounded-xl font-medium transition-all duration-300 ${
                   isActive("/")
-                    ? "bg-teal-100 text-teal-700"
-                    : "text-gray-600 hover:bg-gray-100"
+                    ? "bg-indigo-600 text-white shadow-md"
+                    : "text-gray-600 hover:bg-indigo-50 hover:text-indigo-600"
                 }`}
               >
                 Home
@@ -161,10 +155,10 @@ const Navbar = () => {
                 <Link
                   to="/my-events"
                   onClick={() => setIsMenuOpen(false)}
-                  className={`px-4 py-3 rounded-lg transition-all ${
+                  className={`px-6 py-3 rounded-xl font-medium transition-all duration-300 ${
                     isActive("/my-events")
-                      ? "bg-purple-100 text-purple-700"
-                      : "text-gray-600 hover:bg-gray-100"
+                      ? "bg-indigo-600 text-white shadow-md"
+                      : "text-gray-600 hover:bg-indigo-50 hover:text-indigo-600"
                   }`}
                 >
                   My Events
@@ -177,9 +171,9 @@ const Navbar = () => {
                     handleLogout();
                     setIsMenuOpen(false);
                   }}
-                  className="px-4 py-3 rounded-lg transition-all text-gray-600 hover:bg-gray-100 text-left flex items-center"
+                  className="px-6 py-3 rounded-xl font-medium transition-all duration-300 text-gray-600 hover:bg-indigo-50 hover:text-indigo-600 text-left flex items-center"
                 >
-                  <LogOut className="h-4 w-4 mr-2" />
+                  <LogOut className="h-5 w-5 mr-3" />
                   Logout
                 </button>
               ) : (
@@ -187,14 +181,14 @@ const Navbar = () => {
                   <Link
                     to="/login"
                     onClick={() => setIsMenuOpen(false)}
-                    className="px-4 py-3 rounded-lg transition-all text-gray-600 hover:bg-gray-100"
+                    className="px-6 py-3 rounded-xl font-medium transition-all duration-300 text-gray-600 hover:bg-indigo-50 hover:text-indigo-600"
                   >
                     Login
                   </Link>
                   <Link
                     to="/signup"
                     onClick={() => setIsMenuOpen(false)}
-                    className="px-4 py-3 rounded-lg transition-all text-gray-600 hover:bg-gray-100"
+                    className="px-6 py-3 rounded-xl font-medium transition-all duration-300 text-gray-600 hover:bg-indigo-50 hover:text-indigo-600"
                   >
                     Sign Up
                   </Link>

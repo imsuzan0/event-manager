@@ -7,12 +7,20 @@ import { Footer } from "@/components/ui/footer";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/use-auth";
 import { useEvent } from "@/contexts/event-context";
-import { Plus, Loader2, CalendarDays, Users2, Sparkles } from "lucide-react";
+import { Plus, Loader2, CalendarDays, Sparkles } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import EventForm from "./EventForm";
 
 const Home = () => {
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<"all" | "upcoming" | "past">("all");
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const { toast } = useToast();
   const { user } = useAuth();
   const { getAllEvents } = useEvent();
@@ -62,7 +70,7 @@ const Home = () => {
       navigate("/login", { state: { from: location } });
       return;
     }
-    navigate("/events/new");
+    navigate("events/new")
   };
 
   if (loading) {
@@ -207,6 +215,25 @@ const Home = () => {
           </div>
         )}
       </div>
+
+      {/* Create Event Dialog */}
+      <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+        <DialogContent className="max-w-3xl bg-white/95 backdrop-blur-sm border border-indigo-100 p-6 rounded-3xl">
+          <DialogHeader>
+            <DialogTitle className="text-gray-900 text-2xl font-bold">
+              Create Event
+            </DialogTitle>
+          </DialogHeader>
+          <EventForm
+            mode="create"
+            onSuccess={() => {
+              setIsCreateDialogOpen(false);
+              fetchEvents();
+            }}
+            onCancel={() => setIsCreateDialogOpen(false)}
+          />
+        </DialogContent>
+      </Dialog>
 
       <Footer />
     </div>
