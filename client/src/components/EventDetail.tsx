@@ -124,14 +124,6 @@ const EventDetail = () => {
     fetchEvent();
   }, [fetchEvent]);
 
-  const handleView = () => {
-    if (user) {
-      navigate(`/events/${event._id}`);
-    } else {
-      navigate("/signup");
-    }
-  };
-
   const handleLike = async () => {
     if (!user) {
       toast({
@@ -150,7 +142,7 @@ const EventDetail = () => {
 
     try {
       await toggleLike(id);
-      await fetchLikes(); // Refresh likes count and status
+      await fetchLikes();
       toast({
         title: liked ? "Event unliked" : "Event liked",
         duration: 2000,
@@ -178,7 +170,7 @@ const EventDetail = () => {
 
       setTimeout(() => {
         navigate("/login");
-      }, 500); // Quick delay to show toast before redirect
+      }, 500);
 
       return;
     }
@@ -199,11 +191,6 @@ const EventDetail = () => {
       await addComment(id, commentText.trim());
       await fetchComments();
       setCommentText("");
-      toast({
-        title: "Success",
-        description: "Comment added successfully",
-        duration: 5000,
-      });
     } catch (error) {
       toast({
         title: "Error",
@@ -233,11 +220,6 @@ const EventDetail = () => {
       await fetchComments();
       setEditingComment(null);
       setEditText("");
-      toast({
-        title: "Success",
-        description: "Comment updated successfully",
-        duration: 5000,
-      });
     } catch (error) {
       toast({
         title: "Error",
@@ -255,11 +237,6 @@ const EventDetail = () => {
     try {
       await deleteComment(commentId);
       await fetchComments();
-      toast({
-        title: "Success",
-        description: "Comment deleted successfully",
-        duration: 5000,
-      });
     } catch (error) {
       toast({
         title: "Error",
@@ -273,7 +250,7 @@ const EventDetail = () => {
   };
 
   const formatEventDate = (dateStr: string) => {
-    return format(new Date(dateStr), "PPPP"); // "Monday, April 29th, 2023"
+    return format(new Date(dateStr), "PPPP");
   };
 
   const nextImage = () => {
@@ -288,26 +265,12 @@ const EventDetail = () => {
     );
   };
 
-  const handleImageNext = () => {
-    if (!event) return;
-    setCurrentImageIndex((prevIndex) =>
-      prevIndex === event.image_urls.length - 1 ? 0 : prevIndex + 1
-    );
-  };
-
-  const handleImagePrev = () => {
-    if (!event) return;
-    setCurrentImageIndex((prevIndex) =>
-      prevIndex === 0 ? event.image_urls.length - 1 : prevIndex - 1
-    );
-  };
-
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-teal-50">
+      <div className="min-h-screen flex items-center justify-center bg-[#fafafa]">
         <div className="text-center">
-          <Loader2 className="h-8 w-8 animate-spin text-teal-500 mx-auto mb-4" />
-          <p className="text-gray-600">Loading event details...</p>
+          <Loader2 className="h-10 w-10 animate-spin text-indigo-600 mx-auto mb-4" />
+          <p className="text-gray-600 text-lg">Loading event details...</p>
         </div>
       </div>
     );
@@ -315,8 +278,8 @@ const EventDetail = () => {
 
   if (!event) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-teal-50">
-        <div className="text-center bg-white/80 rounded-xl shadow-lg p-8">
+      <div className="min-h-screen flex items-center justify-center bg-[#fafafa]">
+        <div className="text-center bg-white/80 backdrop-blur-sm rounded-3xl shadow-xl p-8 border border-indigo-100">
           <h2 className="text-2xl font-bold text-gray-900 mb-2">
             Event not found
           </h2>
@@ -326,7 +289,7 @@ const EventDetail = () => {
           <Button
             onClick={() => navigate("/")}
             variant="outline"
-            className="inline-flex items-center"
+            className="inline-flex items-center border-indigo-200 text-indigo-600 hover:bg-indigo-50 hover:text-indigo-700 rounded-xl"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back to Events
@@ -337,23 +300,24 @@ const EventDetail = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-teal-50 py-10">
+    <div className="min-h-screen bg-[#fafafa] py-12">
       <div className="container mx-auto px-4 max-w-4xl">
         {/* Back button */}
         <button
           onClick={() => navigate(-1)}
-          className="inline-flex items-center text-teal-700 hover:text-teal-900 mb-6 font-medium transition-colors"
+          className="inline-flex items-center text-indigo-600 hover:text-indigo-700 mb-6 font-medium transition-colors"
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
           Back to Events
         </button>
 
         {/* Event Image Carousel */}
-        <div className="relative rounded-2xl overflow-hidden mb-8 shadow-xl aspect-video border border-slate-200 bg-white">
+        <div className="relative rounded-3xl overflow-hidden mb-8 shadow-xl aspect-video border border-indigo-100 bg-white/80 backdrop-blur-sm">
           <img
             src={event.image_urls?.[currentImageIndex] || "/placeholder.svg"}
             alt={`${event.title} - Image ${currentImageIndex + 1}`}
-            className="w-full h-full object-cover bg-slate-100"
+            className="w-full h-full object-contain bg-indigo-50"
+            loading="lazy"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
 
@@ -363,18 +327,18 @@ const EventDetail = () => {
               <button
                 type="button"
                 onClick={prevImage}
-                className="absolute left-2 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white/80 text-teal-700 hover:bg-white/100 shadow transition-colors"
+                className="absolute left-3 top-1/2 -translate-y-1/2 p-2 rounded-full bg-indigo-600/80 text-white hover:bg-indigo-700 transition-all duration-300 shadow-md"
               >
-                <ChevronLeft className="w-6 h-6" />
+                <ChevronLeft className="w-7 h-7" />
               </button>
               <button
                 type="button"
                 onClick={nextImage}
-                className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white/80 text-teal-700 hover:bg-white/100 shadow transition-colors"
+                className="absolute right-3 top-1/2 -translate-y-1/2 p-2 rounded-full bg-indigo-600/80 text-white hover:bg-indigo-700 transition-all duration-300 shadow-md"
               >
-                <ChevronRight className="w-6 h-6" />
+                <ChevronRight className="w-7 h-7" />
               </button>
-              <div className="absolute bottom-4 right-4 px-3 py-1.5 rounded-full bg-black/60 text-white text-xs font-medium">
+              <div className="absolute bottom-3 right-3 px-3 py-1 rounded-xl bg-indigo-600/80 text-white text-sm font-medium">
                 {currentImageIndex + 1} / {event.image_urls.length}
               </div>
             </>
@@ -382,21 +346,21 @@ const EventDetail = () => {
         </div>
 
         {/* Event Content */}
-        <div className="bg-white rounded-2xl shadow-xl p-8 mb-10 border border-slate-200">
+        <div className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-xl p-8 mb-10 border border-indigo-100">
           <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-6 gap-4">
             <div>
-              <h1 className="text-3xl md:text-4xl font-extrabold text-slate-900 mb-2 tracking-tight">
+              <h1 className="text-3xl md:text-4xl font-extrabold text-gray-900 mb-2 tracking-tight">
                 {event.title}
               </h1>
-              <span className="inline-block px-3 py-1 rounded-full text-sm font-semibold bg-teal-100 text-teal-800">
+              <span className="inline-block px-3 py-1 rounded-full text-sm font-semibold bg-indigo-100 text-indigo-800">
                 {event.tag}
               </span>
             </div>
             <div className="flex items-center space-x-4">
               <button
                 onClick={handleLike}
-                className={`flex items-center space-x-1 text-gray-500 hover:text-teal-500 transition-colors ${
-                  liked ? "text-teal-500" : ""
+                className={`flex items-center space-x-1 text-gray-500 hover:text-indigo-600 transition-colors ${
+                  liked ? "text-indigo-600" : ""
                 }`}
                 aria-label="Like event"
               >
@@ -409,7 +373,7 @@ const EventDetail = () => {
                     .getElementById("comments-section")
                     ?.scrollIntoView({ behavior: "smooth" })
                 }
-                className="flex items-center space-x-1 text-gray-500 hover:text-teal-500 transition-colors"
+                className="flex items-center space-x-1 text-gray-500 hover:text-indigo-600 transition-colors"
                 aria-label="View comments"
               >
                 <MessageCircle className="h-6 w-6" />
@@ -418,22 +382,22 @@ const EventDetail = () => {
             </div>
           </div>
 
-          <div className="space-y-4 text-slate-700 mb-6">
+          <div className="space-y-4 text-gray-700 mb-6">
             <div className="flex items-center">
-              <Calendar className="h-5 w-5 mr-2 text-teal-500" />
+              <Calendar className="h-5 w-5 mr-2 text-indigo-600" />
               <span className="font-medium">{formatEventDate(event.date)}</span>
             </div>
             <div className="flex items-center">
-              <MapPin className="h-5 w-5 mr-2 text-teal-500" />
+              <MapPin className="h-5 w-5 mr-2 text-indigo-600" />
               <span className="font-medium">{event.location}</span>
             </div>
             <div className="flex items-center">
-              <Phone className="h-5 w-5 mr-2 text-teal-500" />
+              <Phone className="h-5 w-5 mr-2 text-indigo-600" />
               <span className="font-medium">{event.phone_number}</span>
             </div>
           </div>
 
-          <div className="prose max-w-none text-slate-800">
+          <div className="prose max-w-none text-gray-800">
             <p className="whitespace-pre-line leading-relaxed text-lg">
               {event.desc}
             </p>
@@ -443,27 +407,27 @@ const EventDetail = () => {
         {/* Comments Section */}
         <div
           id="comments-section"
-          className="bg-white rounded-2xl shadow-lg p-8 border border-slate-200"
+          className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-xl p-8 border border-indigo-100"
         >
-          <h2 className="text-2xl font-bold text-slate-900 mb-6 flex items-center gap-2">
-            <MessageCircle className="h-6 w-6 text-teal-500" />
+          <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+            <MessageCircle className="h-6 w-6 text-indigo-600" />
             Comments {comments.length ? `(${comments.length})` : ""}
           </h2>
 
           {/* Comment Form */}
           <form onSubmit={handleSubmitComment} className="mb-8">
-            <div className="flex flex-col md:flex-row gap-4">
-              <Textarea
+            <div className="flex flex-col md:flex-row gap-3">
+              <Input
                 value={commentText}
                 onChange={(e) => setCommentText(e.target.value)}
                 placeholder="Write a comment..."
-                className="flex-1 min-h-[48px] resize-none border-slate-200 focus:border-teal-400"
+                className="flex-1 h-12 bg-white/80 backdrop-blur-sm border-indigo-200 focus:ring-indigo-500 focus:border-indigo-500 rounded-xl px-4 py-3 text-gray-800 resize-none transition-all duration-300"
                 disabled={isSubmitting || !user}
               />
               <Button
                 type="submit"
                 disabled={isSubmitting || !user}
-                className="self-end bg-teal-600 hover:bg-teal-700 text-white font-semibold px-6 py-2 rounded-lg shadow"
+                className="h-12 bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-6 rounded-xl hover:from-indigo-700 hover:to-purple-700 transition-all duration-300 shadow-md hover:shadow-lg hover:scale-105"
               >
                 {isSubmitting ? (
                   <>
@@ -484,7 +448,7 @@ const EventDetail = () => {
                 <button
                   type="button"
                   onClick={() => navigate("/login")}
-                  className="text-teal-600 hover:text-teal-500 font-medium underline"
+                  className="text-indigo-600 hover:text-indigo-700 font-medium underline"
                 >
                   login
                 </button>{" "}
@@ -499,13 +463,13 @@ const EventDetail = () => {
               comments.map((comment) => (
                 <div key={comment._id} className="flex space-x-3 items-start">
                   <div className="flex-shrink-0">
-                    <div className="w-10 h-10 rounded-full bg-teal-100 flex items-center justify-center text-teal-600 font-bold text-lg shadow">
+                    <div className="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-bold text-lg shadow">
                       {comment.user_id.fullName[0]}
                     </div>
                   </div>
-                  <div className="flex-grow bg-slate-50 rounded-xl px-4 py-3 shadow-sm border border-slate-100">
+                  <div className="flex-grow bg-indigo-50 rounded-xl px-4 py-3 shadow-sm border border-indigo-100">
                     <div className="flex items-center justify-between">
-                      <div className="text-sm font-semibold text-slate-900">
+                      <div className="text-sm font-semibold text-gray-900">
                         {comment.user_id.fullName}
                       </div>
                       {user && comment.user_id._id === user.id && (
@@ -517,7 +481,7 @@ const EventDetail = () => {
                               setEditingComment(comment._id);
                               setEditText(comment.text);
                             }}
-                            className="text-gray-500 hover:text-teal-500"
+                            className="text-gray-500 hover:text-indigo-600"
                           >
                             <Edit className="h-4 w-4" />
                           </Button>
@@ -531,23 +495,25 @@ const EventDetail = () => {
                                 <Trash2 className="h-4 w-4" />
                               </Button>
                             </AlertDialogTrigger>
-                            <AlertDialogContent>
+                            <AlertDialogContent className="bg-white/95 backdrop-blur-sm border border-indigo-100">
                               <AlertDialogHeader>
-                                <AlertDialogTitle>
+                                <AlertDialogTitle className="text-gray-900">
                                   Delete Comment
                                 </AlertDialogTitle>
-                                <AlertDialogDescription>
+                                <AlertDialogDescription className="text-gray-600">
                                   Are you sure you want to delete this comment?
                                   This action cannot be undone.
                                 </AlertDialogDescription>
                               </AlertDialogHeader>
                               <AlertDialogFooter>
-                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                <AlertDialogCancel className="border-indigo-200 text-indigo-600 hover:bg-indigo-50 hover:text-indigo-700 rounded-xl">
+                                  Cancel
+                                </AlertDialogCancel>
                                 <AlertDialogAction
                                   onClick={() =>
                                     handleDeleteComment(comment._id)
                                   }
-                                  className="bg-red-500 hover:bg-red-600"
+                                  className="bg-red-500 hover:bg-red-600 text-white rounded-xl"
                                 >
                                   Delete
                                 </AlertDialogAction>
@@ -562,7 +528,7 @@ const EventDetail = () => {
                         <Textarea
                           value={editText}
                           onChange={(e) => setEditText(e.target.value)}
-                          className="mb-2 border-slate-200 focus:border-teal-400"
+                          className="mb-2 bg-white/80 backdrop-blur-sm border-indigo-200 focus:ring-indigo-500 focus:border-indigo-500 rounded-xl px-4 py-3 text-gray-800"
                         />
                         <div className="flex justify-end space-x-2">
                           <Button
@@ -572,6 +538,7 @@ const EventDetail = () => {
                               setEditingComment(null);
                               setEditText("");
                             }}
+                            className="border-indigo-200 text-indigo-600 hover:bg-indigo-50 hover:text-indigo-700 rounded-xl"
                           >
                             Cancel
                           </Button>
@@ -579,7 +546,7 @@ const EventDetail = () => {
                             size="sm"
                             onClick={() => handleUpdateComment(comment._id)}
                             disabled={isSubmitting}
-                            className="bg-teal-600 hover:bg-teal-700 text-white"
+                            className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl hover:from-indigo-700 hover:to-purple-700 transition-all duration-300 shadow-md"
                           >
                             {isSubmitting ? (
                               <Loader2 className="h-4 w-4 animate-spin" />
@@ -590,7 +557,7 @@ const EventDetail = () => {
                         </div>
                       </div>
                     ) : (
-                      <div className="mt-1 text-slate-800 text-base leading-relaxed">
+                      <div className="mt-1 text-gray-800 text-base leading-relaxed">
                         {comment.text}
                       </div>
                     )}
@@ -598,7 +565,7 @@ const EventDetail = () => {
                 </div>
               ))
             ) : (
-              <p className="text-gray-500 text-center py-4">
+              <p className="text-gray-600 text-center py-4">
                 No comments yet. Be the first to comment!
               </p>
             )}
