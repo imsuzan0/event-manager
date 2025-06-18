@@ -24,6 +24,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useEvent } from "@/contexts/event-context";
 import EventCard from "./EventCard";
 import EventForm from "./EventForm";
+import { useAuth } from "@/hooks/use-auth";
 
 const MyEvents = () => {
   const [events, setEvents] = useState<Event[]>([]);
@@ -34,6 +35,7 @@ const MyEvents = () => {
   const { toast } = useToast();
   const { getMyEvents, deleteEvent } = useEvent();
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   const fetchMyEvents = useCallback(async () => {
     try {
@@ -80,6 +82,19 @@ const MyEvents = () => {
     }
   };
 
+  const handleCreateEvent = () => {
+    if (!user) {
+      toast({
+        title: "Login Required",
+        description: "Please login to create an event",
+        variant: "default",
+      });
+      navigate("/login", { state: { from: location } });
+      return;
+    }
+    navigate("/events/new");
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -96,7 +111,7 @@ const MyEvents = () => {
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-semibold">My Events</h1>
         <Button
-          onClick={() => navigate("/post-event")}
+          onClick={handleCreateEvent}
           className="bg-teal-500 hover:bg-teal-600"
         >
           <Plus className="w-4 h-4 mr-2" />
@@ -110,7 +125,7 @@ const MyEvents = () => {
             You haven't created any events yet.
           </p>
           <Button
-            onClick={() => navigate("/post-event")}
+            onClick={handleCreateEvent}
             className="bg-teal-500 hover:bg-teal-600"
           >
             <Plus className="w-4 h-4 mr-2" />
