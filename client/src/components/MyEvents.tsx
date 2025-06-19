@@ -25,7 +25,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/use-auth";
 import type { Event } from "@/types/Event";
-import Footer from "./Footer";
+import { Footer } from "@/components/ui/footer";
 
 const MyEvents = () => {
   const [events, setEvents] = useState<Event[]>([]);
@@ -146,55 +146,17 @@ const MyEvents = () => {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {events.map((event) => (
-              <div key={event._id} className="relative">
-                <EventCard event={event} onRefresh={fetchMyEvents} />
-                <div className="absolute top-2 right-2 flex gap-2">
-                  <Button
-                    size="icon"
-                    variant="secondary"
-                    onClick={() => handleEditEvent(event._id)}
-                  >
-                    <Edit className="h-4 w-4" />
-                  </Button>
-                  <AlertDialog>
-                    <AlertDialogTrigger asChild>
-                      <Button
-                        size="icon"
-                        variant="destructive"
-                        onClick={() => setDeletingEventId(event._id)}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </AlertDialogTrigger>
-                    <AlertDialogContent>
-                      <AlertDialogHeader>
-                        <AlertDialogTitle>Delete Event</AlertDialogTitle>
-                        <AlertDialogDescription>
-                          Are you sure you want to delete this event? This
-                          action cannot be undone.
-                        </AlertDialogDescription>
-                      </AlertDialogHeader>
-                      <AlertDialogFooter>
-                        <AlertDialogCancel
-                          onClick={() => setDeletingEventId(null)}
-                        >
-                          Cancel
-                        </AlertDialogCancel>
-                        <AlertDialogAction
-                          onClick={() => {
-                            if (deletingEventId) {
-                              handleDeleteEvent(deletingEventId);
-                            }
-                          }}
-                          className="bg-red-500 hover:bg-red-600"
-                        >
-                          Delete
-                        </AlertDialogAction>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
-                </div>
-              </div>
+              <EventCard
+                key={event._id}
+                event={event}
+                onRefresh={fetchMyEvents}
+                onEdit={() => handleEditEvent(event._id)}
+                onDelete={() => {
+                  setDeletingEventId(event._id);
+                  handleDeleteEvent(event._id);
+                }}
+                showActions={true}
+              />
             ))}
           </div>
         )}
@@ -247,8 +209,8 @@ const MyEvents = () => {
         </Dialog>
       </div>
       <div className="absolute bottom-0 left-0 w-full">
-      <Footer />
-    </div>
+        <Footer />
+      </div>
     </div>
   );
 };
