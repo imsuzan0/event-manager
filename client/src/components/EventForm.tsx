@@ -311,8 +311,7 @@ const EventForm = ({
         <div className="mt-2 space-y-4">
           {/* Image upload button */}
           <div className="flex items-center justify-center w-full">
-            <label className="w-full flex flex-col items-center px-4 py-6 bg-white text-teal-500 rounded-lg shadow-lg tracking-wide border border-teal-500 cursor-pointer hover:bg-teal-500 hover:text-white transition-colors">
-              <Upload className="w-8 h-8" />
+<label className="w-full flex flex-col items-center px-4 py-6 bg-white text-indigo-600 rounded-lg shadow-lg tracking-wide border border-indigo-600 cursor-pointer hover:bg-gradient-to-r hover:from-indigo-600 hover:to-purple-600 hover:text-white transition-all ">              <Upload className="w-8 h-8" />
               <span className="mt-2 text-base">Select event images</span>
               <input
                 type="file"

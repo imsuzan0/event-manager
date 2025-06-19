@@ -1,13 +1,23 @@
 import { useState, useCallback, useEffect } from "react";
-import {
-  Loader2,
-  Plus,
-  Edit,
-  Trash2,
-} from "lucide-react";
+import { Loader2, Plus, Edit, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from "@/components/ui/alert-dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogTrigger,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogCancel,
+  AlertDialogAction,
+} from "@/components/ui/alert-dialog";
 import EventCard from "@/components/EventCard";
 import EventForm from "@/components/EventForm";
 import { useEvent } from "@/contexts/event-context";
@@ -158,8 +168,8 @@ const MyEvents = () => {
                       <AlertDialogHeader>
                         <AlertDialogTitle>Delete Event</AlertDialogTitle>
                         <AlertDialogDescription>
-                          Are you sure you want to delete this event? This action
-                          cannot be undone.
+                          Are you sure you want to delete this event? This
+                          action cannot be undone.
                         </AlertDialogDescription>
                       </AlertDialogHeader>
                       <AlertDialogFooter>
@@ -189,30 +199,48 @@ const MyEvents = () => {
 
         {/* Edit Event Dialog */}
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-          <DialogContent className="max-w-3xl">
+          <DialogContent className="max-w-3xl max-h-[90vh] flex flex-col">
             <DialogHeader>
               <DialogTitle>Edit Event</DialogTitle>
             </DialogHeader>
-            {editingEvent && (
-              <EventForm
-                mode="edit"
-                eventId={editingEvent._id}
-                initialData={{
-                  title: editingEvent.title,
-                  desc: editingEvent.desc,
-                  date: editingEvent.date,
-                  location: editingEvent.location,
-                  tag: editingEvent.tag,
-                  phoneNumber: editingEvent.phone_number,
-                }}
-                existingImages={editingEvent.image_urls}
-                onSuccess={() => {
-                  setIsDialogOpen(false);
-                  fetchMyEvents();
-                }}
-                onCancel={() => setIsDialogOpen(false)}
-              />
-            )}
+
+            {/* Scrollable Form Area */}
+            <div className="flex-1 overflow-y-auto">
+              {editingEvent && (
+                <EventForm
+                  mode="edit"
+                  eventId={editingEvent._id}
+                  initialData={{
+                    title: editingEvent.title,
+                    desc: editingEvent.desc,
+                    date: editingEvent.date,
+                    location: editingEvent.location,
+                    tag: editingEvent.tag,
+                    phoneNumber: editingEvent.phone_number,
+                  }}
+                  existingImages={editingEvent.image_urls}
+                  onSuccess={() => {
+                    setIsDialogOpen(false);
+                    fetchMyEvents();
+                  }}
+                  onCancel={() => setIsDialogOpen(false)}
+                />
+              )}
+            </div>
+
+            {/* Dialog Footer (Sticky Buttons) */}
+            <div className="mt-4 flex justify-end space-x-4">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setIsDialogOpen(false)}
+              >
+                Cancel
+              </Button>
+              <Button type="submit" form="event-form">
+                {editingEvent ? "Update Event" : "Create Event"}
+              </Button>
+            </div>
           </DialogContent>
         </Dialog>
       </div>
