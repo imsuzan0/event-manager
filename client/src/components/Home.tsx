@@ -218,7 +218,7 @@ const Home = () => {
 
       {/* Create Event Dialog */}
       <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-        <DialogContent className="max-w-3xl bg-white/95 backdrop-blur-sm border border-indigo-100 p-6 rounded-3xl">
+        <DialogContent className="max-w-3xl bg-white/95 backdrop-blur-sm border border-indigo-100 p-6 rounded-3xl mx-auto">
           <DialogHeader>
             <DialogTitle className="text-gray-900 text-2xl font-bold">
               Create Event

@@ -193,9 +193,13 @@ const EventForm = ({
   };
 
   return (
+    <div className="w-full min-h-screen flex justify-center items-start p-4">
+    <div className="w-full max-w-4xl">
     <form
       onSubmit={handleSubmit}
-      className="space-y-4 max-h-[calc(100vh-4rem)] overflow-y-auto pb-20 relative"
+      // className="space-y-4 max-h-[calc(100vh-4rem)] overflow-y-auto pb-20 relative"
+      // className="space-y-4 overflow-y-auto pb-20 relative w-full"
+      className="space-y-4 pb-20 w-full"
     >
       <div>
         <Label htmlFor="title">Event Title *</Label>
@@ -208,7 +212,7 @@ const EventForm = ({
           onChange={handleInputChange}
           placeholder="Enter your event title"
           disabled={isSubmitting}
-          className="mt-1"
+          className="mt-1 w-full"
         />
       </div>
 
@@ -223,7 +227,7 @@ const EventForm = ({
           onChange={handleInputChange}
           placeholder="Describe your event in detail"
           disabled={isSubmitting}
-          className="mt-1"
+          className="mt-1 w-full"
         />
       </div>
 
@@ -241,7 +245,7 @@ const EventForm = ({
           onChange={handleInputChange}
           placeholder="Event location"
           disabled={isSubmitting}
-          className="mt-1"
+          className="mt-1 w-full"
         />
       </div>
 
@@ -259,7 +263,7 @@ const EventForm = ({
           onChange={handleInputChange}
           min={new Date().toISOString().slice(0, 16)}
           disabled={isSubmitting}
-          className="mt-1"
+          className="mt-1 w-full"
         />
       </div>
 
@@ -277,7 +281,7 @@ const EventForm = ({
           onChange={handleInputChange}
           placeholder="Your contact number"
           disabled={isSubmitting}
-          className="mt-1"
+          className="mt-1 w-full"
         />
       </div>
 
@@ -389,6 +393,8 @@ const EventForm = ({
         </Button>
       </div>
     </form>
+    </div>
+    </div>
   );
 };
 

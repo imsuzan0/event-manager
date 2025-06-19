@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import type { Event } from "@/types/Event";
 import { useEvent } from "@/contexts/event-context";
 import { useAuth } from "@/hooks/use-auth";
+import { format } from "date-fns";
 
 interface EventCardProps {
   event: Event;
@@ -20,6 +21,10 @@ const EventCard = memo(({ event, onRefresh }: EventCardProps) => {
   const [isLiking, setIsLiking] = useState(false);
 
   const { user } = useAuth();
+
+  const formatEventDateTime = (dateStr: string) => {
+    return format(new Date(dateStr), "PPPP 'at' p");
+  };
 
   // Only fetch initial state once when component mounts
   useEffect(() => {
@@ -126,9 +131,7 @@ const EventCard = memo(({ event, onRefresh }: EventCardProps) => {
         <div className="space-y-3">
           <div className="flex items-center text-gray-600">
             <Calendar className="h-4 w-4 mr-3 text-indigo-600" />
-            <span className="text-sm">
-              {new Date(event.date).toLocaleDateString()}
-            </span>
+            <span className="text-sm">{formatEventDateTime(event.date)} </span>
           </div>
 
           <div className="flex items-center text-gray-600">

@@ -8,26 +8,17 @@ import { useToast } from "@/hooks/use-toast";
 import { Calendar, Eye, EyeOff } from "lucide-react";
 
 const Login = () => {
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-  });
+  const [formData, setFormData] = useState({ email: "", password: "" });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const { login, isLoading } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
   const location = useLocation();
-
   const from = location.state?.from?.pathname || "/";
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    // Reset any previous error states
-    setFormData((prev) => ({ ...prev }));
-
-    // Validate required fields
     if (!formData.email || !formData.password) {
       toast({
         title: "Validation Error",
@@ -37,8 +28,6 @@ const Login = () => {
       });
       return;
     }
-
-    // Validate email format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(formData.email)) {
       toast({
@@ -64,7 +53,6 @@ const Login = () => {
         error instanceof Error
           ? error.message
           : "An error occurred during login. Please try again.";
-
       toast({
         title: "Login failed",
         description: errorMessage,
@@ -77,28 +65,31 @@ const Login = () => {
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-teal-50 flex items-center justify-center px-4">
-      <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-8">
+    <div className="min-h-screen bg-[#fafafa] relative overflow-hidden flex items-center justify-center px-4">
+      {/* Background Blobs */}
+      <div className="absolute inset-0 z-0 overflow-hidden">
+        <div className="absolute top-0 left-1/4 w-72 h-72 bg-purple-200 rounded-full mix-blend-multiply filter blur-2xl opacity-70 animate-blob"></div>
+        <div className="absolute top-0 right-1/4 w-72 h-72 bg-indigo-200 rounded-full mix-blend-multiply filter blur-2xl opacity-70 animate-blob animation-delay-2000"></div>
+        <div className="absolute -bottom-8 left-1/3 w-72 h-72 bg-pink-200 rounded-full mix-blend-multiply filter blur-2xl opacity-70 animate-blob animation-delay-4000"></div>
+      </div>
+
+      {/* Login Card */}
+      <div className="relative z-10 max-w-md w-full bg-white/90 backdrop-blur-sm rounded-3xl shadow-2xl p-8">
         <div className="text-center mb-8">
           <div className="flex items-center justify-center space-x-2 mb-4">
-            <div className="p-2 bg-gradient-to-r from-teal-500 to-coral-500 rounded-lg">
+            <div className="p-3 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl group-hover:scale-110 group-hover:shadow-lg transition-all duration-300">
               <Calendar className="h-6 w-6 text-white" />
             </div>
-            <span className="text-xl font-bold bg-gradient-to-r from-teal-600 to-coral-600 bg-clip-text text-transparent">
+            <span className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-800">
               EventGhar
             </span>
           </div>
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">
-            Welcome Back
-          </h1>
-          <p className="text-gray-600">Sign in to your account</p>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Welcome Back</h1>
+          <p className="text-gray-600 text-lg">Sign in to your account</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -148,7 +139,7 @@ const Login = () => {
 
           <Button
             type="submit"
-            className="w-full"
+            className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-6 py-4 h-auto text-lg rounded-2xl hover:from-indigo-700 hover:to-purple-700 transition-all duration-300 shadow-xl hover:shadow-2xl"
             disabled={isLoading || isSubmitting}
           >
             {isLoading || isSubmitting ? "Signing in..." : "Sign in"}
@@ -158,7 +149,7 @@ const Login = () => {
             Don't have an account?{" "}
             <Link
               to="/signup"
-              className="font-semibold text-teal-600 hover:text-teal-500"
+              className="font-semibold text-indigo-600 hover:text-indigo-700"
             >
               Sign up
             </Link>

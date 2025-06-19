@@ -73,6 +73,10 @@ const EventDetail = () => {
   const { user } = useAuth();
   const { toast } = useToast();
 
+  const formatEventDateTime = (dateStr: string) => {
+    return format(new Date(dateStr), "PPPP 'at' p");
+  };
+
   const fetchLikes = useCallback(async () => {
     if (!id) return;
     try {
@@ -385,7 +389,9 @@ const EventDetail = () => {
           <div className="space-y-4 text-gray-700 mb-6">
             <div className="flex items-center">
               <Calendar className="h-5 w-5 mr-2 text-indigo-600" />
-              <span className="font-medium">{formatEventDate(event.date)}</span>
+              <span className="font-medium">
+                {formatEventDateTime(event.date)}
+              </span>
             </div>
             <div className="flex items-center">
               <MapPin className="h-5 w-5 mr-2 text-indigo-600" />

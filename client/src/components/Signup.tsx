@@ -22,7 +22,6 @@ const Signup = () => {
   const navigate = useNavigate();
 
   const validateForm = () => {
-    // Check required fields
     if (
       !formData.fullName ||
       !formData.email ||
@@ -37,7 +36,6 @@ const Signup = () => {
       return false;
     }
 
-    // Validate email format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(formData.email)) {
       toast({
@@ -48,7 +46,6 @@ const Signup = () => {
       return false;
     }
 
-    // Check password length
     if (formData.password.length < 6) {
       toast({
         title: "Validation Error",
@@ -58,7 +55,6 @@ const Signup = () => {
       return false;
     }
 
-    // Check password match
     if (formData.password !== formData.confirmPassword) {
       toast({
         title: "Validation Error",
@@ -74,9 +70,7 @@ const Signup = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!validateForm()) {
-      return;
-    }
+    if (!validateForm()) return;
 
     setIsSubmitting(true);
     try {
@@ -101,28 +95,33 @@ const Signup = () => {
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-teal-50 flex items-center justify-center px-4">
-      <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-8">
+    <div className="min-h-screen bg-[#fafafa] relative overflow-hidden flex items-center justify-center px-4">
+      {/* Background Blobs */}
+      <div className="absolute inset-0 z-0 overflow-hidden">
+        <div className="absolute top-0 left-1/4 w-72 h-72 bg-purple-200 rounded-full mix-blend-multiply filter blur-2xl opacity-70 animate-blob"></div>
+        <div className="absolute top-0 right-1/4 w-72 h-72 bg-indigo-200 rounded-full mix-blend-multiply filter blur-2xl opacity-70 animate-blob animation-delay-2000"></div>
+        <div className="absolute -bottom-8 left-1/3 w-72 h-72 bg-pink-200 rounded-full mix-blend-multiply filter blur-2xl opacity-70 animate-blob animation-delay-4000"></div>
+      </div>
+
+      {/* Signup Card */}
+      <div className="relative z-10 max-w-md w-full bg-white/90 backdrop-blur-sm rounded-3xl shadow-2xl p-8">
         <div className="text-center mb-8">
           <div className="flex items-center justify-center space-x-2 mb-4">
-            <div className="p-2 bg-gradient-to-r from-teal-500 to-coral-500 rounded-lg">
+            <div className="p-3 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl group-hover:scale-110 group-hover:shadow-lg transition-all duration-300">
               <Calendar className="h-6 w-6 text-white" />
             </div>
-            <span className="text-xl font-bold bg-gradient-to-r from-teal-600 to-coral-600 bg-clip-text text-transparent">
+            <span className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-800">
               EventGhar
             </span>
           </div>
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">
             Create Account
           </h1>
-          <p className="text-gray-600">Join the EventGhar community</p>
+          <p className="text-gray-600 text-lg">Join the EventGhar community</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -216,7 +215,7 @@ const Signup = () => {
 
           <Button
             type="submit"
-            className="w-full"
+            className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-6 py-4 h-auto text-lg rounded-2xl hover:from-indigo-700 hover:to-purple-700 transition-all duration-300 shadow-xl hover:shadow-2xl"
             disabled={isLoading || isSubmitting}
           >
             {isLoading || isSubmitting
@@ -228,7 +227,7 @@ const Signup = () => {
             Already have an account?{" "}
             <Link
               to="/login"
-              className="font-semibold text-teal-600 hover:text-teal-500"
+              className="font-semibold text-indigo-600 hover:text-indigo-700"
             >
               Sign in
             </Link>
