@@ -25,6 +25,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/use-auth";
 import type { Event } from "@/types/Event";
+import Footer from "./Footer";
 
 const MyEvents = () => {
   const [events, setEvents] = useState<Event[]>([]);
@@ -41,13 +42,15 @@ const MyEvents = () => {
     try {
       setLoading(true);
       const fetchedEvents = await getMyEvents();
-      setEvents(fetchedEvents);
+      console.log("Fetched Events:", fetchedEvents);
+      setEvents(Array.isArray(fetchedEvents) ? fetchedEvents : []);
     } catch (error) {
       toast({
         title: "Error",
         description: "Failed to load your events. Please try again.",
         variant: "destructive",
       });
+      setEvents([]); // clear on error
     } finally {
       setLoading(false);
     }
@@ -107,14 +110,13 @@ const MyEvents = () => {
   }
 
   return (
-    <div className="relative bg-gradient-to-b from-indigo-50 to-[#fafafa] min-h-screen pb-32">
+    <div className="relative bg-gradient-to-b from-indigo-50 to-[#fafafa] min-h-screen  pb-72">
       {/* Decorative blobs */}
       <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
         <div className="absolute top-0 left-1/4 w-72 h-72 bg-purple-200 rounded-full mix-blend-multiply filter blur-2xl opacity-70 animate-blob"></div>
         <div className="absolute top-0 right-1/4 w-72 h-72 bg-indigo-200 rounded-full mix-blend-multiply filter blur-2xl opacity-70 animate-blob animation-delay-2000"></div>
         <div className="absolute -bottom-8 left-1/3 w-72 h-72 bg-pink-200 rounded-full mix-blend-multiply filter blur-2xl opacity-70 animate-blob animation-delay-4000"></div>
       </div>
-
       {/* Main content */}
       <div className="relative z-10 container mx-auto px-4 py-8">
         <div className="flex justify-between items-center mb-6">
@@ -128,14 +130,14 @@ const MyEvents = () => {
           </Button>
         </div>
 
-        {events.length === 0 ? (
+        {!Array.isArray(events) || events.length === 0 ? (
           <div className="text-center py-12">
             <p className="text-gray-600 mb-4">
               You haven't created any events yet.
             </p>
             <Button
               onClick={handleCreateEvent}
-              className="bg-teal-500 hover:bg-teal-600"
+              className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-6 py-4 h-auto text-sm rounded-2xl hover:from-indigo-700 hover:to-purple-700 transition-all duration-300 shadow-xl hover:shadow-2xl"
             >
               <Plus className="w-4 h-4 mr-2" />
               Create Your First Event
@@ -244,6 +246,9 @@ const MyEvents = () => {
           </DialogContent>
         </Dialog>
       </div>
+      <div className="absolute bottom-0 left-0 w-full">
+      <Footer />
+    </div>
     </div>
   );
 };

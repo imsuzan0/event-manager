@@ -196,9 +196,8 @@ const EventForm = ({
     <div className="w-full min-h-screen flex justify-center items-start p-4">
     <div className="w-full max-w-4xl">
     <form
+      id="event-form"
       onSubmit={handleSubmit}
-      // className="space-y-4 max-h-[calc(100vh-4rem)] overflow-y-auto pb-20 relative"
-      // className="space-y-4 overflow-y-auto pb-20 relative w-full"
       className="space-y-4 pb-20 w-full"
     >
       <div>
